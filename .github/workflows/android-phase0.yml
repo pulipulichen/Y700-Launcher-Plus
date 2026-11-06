@@ -2,14 +2,14 @@ name: Y700 Launcher Android build
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - ".github/workflows/android-phase0.yml"
       - "app/**"
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - "gradle.properties"
+      - "keystore/**"
   workflow_dispatch:
 
 permissions:
@@ -23,65 +23,86 @@ jobs:
   build-and-publish:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     permissions:
       contents: write
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
       - name: Set up JDK 17
         uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
           distribution: temurin
           java-version: '17'
-
       - name: Set up Android SDK 36
         uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
         with:
           accept-android-sdk-licenses: true
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
-
       - name: Set up Gradle 8.13
         uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         with:
           gradle-version: '8.13'
           cache-provider: basic
-
-      - name: Compile and lint with fixed test signing
+      - name: Build and lint with fixed signing
         env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           Y700_TEST_KEYSTORE_BASE64: ${{ secrets.Y700_TEST_KEYSTORE_BASE64 }}
         shell: bash
         run: |
-          : "${Y700_TEST_KEYSTORE_BASE64:?Set the fixed Y700 test keystore secret}"
+          set -euo pipefail
           umask 077
-          export Y700_TEST_KEYSTORE_PATH="$(mktemp "$RUNNER_TEMP/y700-test.XXXXXXXX.p12")"
-          trap 'rm -f "$Y700_TEST_KEYSTORE_PATH"' EXIT
-          printf '%s' "$Y700_TEST_KEYSTORE_BASE64" | base64 --decode > "$Y700_TEST_KEYSTORE_PATH"
-          unset Y700_TEST_KEYSTORE_BASE64
-          gradle --no-daemon --console=plain :app:assembleDebug :app:lintDebug
-
+          trap 'rm -f signing/release.keystore signing/signing.properties "$RUNNER_TEMP"/y700-test.*.p12' EXIT
+          if [[ -n "$SIGNING_KEYSTORE_BASE64$SIGNING_STORE_PASSWORD$SIGNING_KEY_PASSWORD$SIGNING_KEY_ALIAS" ]]; then
+            if [[ -z "$SIGNING_KEYSTORE_BASE64" || -z "$SIGNING_STORE_PASSWORD" || -z "$SIGNING_KEY_PASSWORD" || -z "$SIGNING_KEY_ALIAS" ]]; then
+              echo "::error::Incomplete SIGNING_* secret set; refusing certificate fallback."
+              exit 1
+            fi
+            mkdir -p signing
+            printf '%s' "$SIGNING_KEYSTORE_BASE64" | base64 --decode > signing/release.keystore
+            test -s signing/release.keystore
+            printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\n' "$SIGNING_STORE_PASSWORD" "$SIGNING_KEY_PASSWORD" "$SIGNING_KEY_ALIAS" > signing/signing.properties
+            keytool -list -keystore signing/release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" >/dev/null
+            fp="$(keytool -exportcert -rfc -keystore signing/release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" 2>/dev/null | openssl x509 -noout -fingerprint -sha256 | cut -d= -f2)"
+            [[ "$fp" == '8F:4C:5A:D0:18:AA:5F:E5:32:C4:F1:FF:12:60:EF:08:02:82:48:9D:C6:D2:03:2A:5E:BD:62:AF:18:EE:54:B3' ]] || { echo "::error::Permanent key fingerprint mismatch."; exit 1; }
+            echo "Using verified permanent signing certificate."
+          elif [[ -n "$Y700_TEST_KEYSTORE_BASE64" ]]; then
+            export Y700_TEST_KEYSTORE_PATH
+            Y700_TEST_KEYSTORE_PATH="$(mktemp "$RUNNER_TEMP/y700-test.XXXXXXXX.p12")"
+            printf '%s' "$Y700_TEST_KEYSTORE_BASE64" | base64 --decode > "$Y700_TEST_KEYSTORE_PATH"
+            test -s "$Y700_TEST_KEYSTORE_PATH"
+            echo "::warning::Still using the original temporary Y700 test certificate."
+          else
+            echo "::error::Missing complete SIGNING_* credentials and legacy Y700_TEST_KEYSTORE_BASE64."
+            exit 1
+          fi
+          version_code=$(( $(date -u +%s) / 60 ))
+          gradle --no-daemon --console=plain -PappVersionCode="$version_code" :app:assembleDebug :app:lintDebug
       - name: Prepare release assets
         shell: bash
         run: |
+          set -euo pipefail
           apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
           test -s app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
           cp app/build/outputs/apk/debug/app-debug.apk "$apk_path"
-          sha256sum "$apk_path" > "$apk_path.sha256"
-
+          (cd "$RUNNER_TEMP" && sha256sum Y700-Launcher-Plus-debug.apk > Y700-Launcher-Plus-debug.apk.sha256)
       - name: Publish latest sideload APK
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          release_tag="launcher-latest"
-          apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
-          checksum_path="$apk_path.sha256"
-          release_notes="Current personal-use debug APK. Source commit: $GITHUB_SHA; Actions run: $GITHUB_RUN_ID."
-          if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$release_tag" "$apk_path" "$checksum_path" --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit "$release_tag" --repo "$GITHUB_REPOSITORY" --title "Y700 Launcher Plus (latest)" --notes "$release_notes" --prerelease
+          set -euo pipefail
+          tag=launcher-latest
+          apk="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
+          checksum="$apk.sha256"
+          notes="Signed sideload APK. Source commit: $GITHUB_SHA; Actions run: $GITHUB_RUN_ID. See keystore/README.md for signer migration."
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" "$checksum" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "Y700 Launcher Plus (latest)" --notes "$notes" --prerelease
           else
-            gh release create "$release_tag" "$apk_path" "$checksum_path" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Y700 Launcher Plus (latest)" --notes "$release_notes" --prerelease
+            gh release create "$tag" "$apk" "$checksum" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Y700 Launcher Plus (latest)" --notes "$notes" --prerelease
           fi

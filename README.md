@@ -11,9 +11,9 @@ A personal, non-root Android HOME launcher for Lenovo Legion Y700 tablets. The f
 - Traditional Chinese and English interface strings.
 - No Root access, privileged permissions, or proprietary ZUI APIs.
 
-The app is for personal use and sideloading. GitHub Actions compiles and lints a debug APK, then publishes the APK and SHA-256 checksum as a prerelease asset. No emulator is used in CI.
+The app currently supports personal sideloading and is planned for a paid Google Play release. GitHub Actions compiles and lints a debug APK, then publishes the APK and SHA-256 checksum as a prerelease asset. No emulator is used in CI.
 
-Sideload builds from GitHub Actions use a fixed test keystore supplied by the repository secret `Y700_TEST_KEYSTORE_BASE64`. Its PKCS12 alias is `androiddebugkey` and its temporary test password is `android`. If an older APK uses a different certificate, Android requires a one-time reinstall, which clears app data. Keep the same keystore for subsequent updates.
+The permanent PKCS12/RSA-3072 signing identity is stored privately on the PVE host. Both debug APKs and Google Play upload AABs use the same identity once all four `SIGNING_*` repository secrets are configured. Until then, sideload debug builds retain the existing fixed `Y700_TEST_KEYSTORE_BASE64` signing fallback; AAB releases refuse the test key. Switching identities requires a one-time uninstall/reinstall after exporting the launcher layout. See [keystore setup](keystore/README.md) and [Google Play checklist](GOOGLE_PLAY.md).
 
 See [Phase 0 device checks](docs/PHASE0.md) [architecture](docs/ARCHITECTURE.md), and the [Nova feature roadmap](docs/NOVA-PARITY.md).
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Created permanent RSA-3072/PKCS12 signing identity on puli-home-pve without committing private material. Added a pinned certificate verification script, permanent signing for debug/APK and Google Play AAB, a manual signed AAB release workflow, and kept the legacy fixed-test-key debug fallback pending repository-secret configuration. See `keystore/README.md` for one-time APK signer migration.
+
 - Added versioned layout export and confirmed restore using Android document providers in the same launcher APK.
 
 - 0.2.0 separates home pages, app drawer and launcher dock, adds home grid settings and hidden apps, and migrates existing pins. CI uses the existing fixed signing workflow and publishes to `launcher-latest`. See `docs/NOVA-PARITY.md` for remaining feature and Y700 acceptance checks.
