@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Actions run 42236542284 (commit 8b6c219) failed in Compile and lint with fixed test signing at `:app:mergeExtDexDebug` with `OutOfMemoryError: Java heap space`. Set the Gradle heap to 2 GiB and rebuilt.
 
 - GitHub Actions now signs sideload APKs with a fixed temporary test keystore and verifies the APK signature before publishing to `launcher-latest`.
 - Removed the unconditional taskbar hint. On the test Y700, the native ZUI Taskbar was hidden with `open_taskbar=0`. Restoring the original `zui_taskbar_feature_enable=0` and setting `open_taskbar=1` restored the ZUI window and its touchable region while Launcher Plus remained the default HOME.
