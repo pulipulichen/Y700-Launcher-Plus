@@ -2,7 +2,7 @@
 set -euo pipefail
 # This project has an existing permanent key; never generate a replacement.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DIR="${Y700_SIGNING_DIR:-$ROOT/signing}"
+DIR="${Y700_SIGNING_DIR:-/root/.local/share/y700-launcher-plus-signing}"
 KEY="$DIR/release.keystore"
 PASSFILE="$DIR/signing.password"
 ALIAS="y700-launcher-plus"
@@ -13,10 +13,11 @@ MODE="${1:---verify}"
 usage() {
   cat <<'EOF'
 Usage: ./keystore/setup.sh [--verify|--sync-github]
-Set Y700_SIGNING_DIR to the trusted directory containing release.keystore and signing.password.
+Default signing directory: /root/.local/share/y700-launcher-plus-signing (CT 9102).
+Override Y700_SIGNING_DIR only when restoring the same permanent identity.
 --verify: confirm identity without printing secrets.
 --sync-github: verify and update four encrypted GitHub Actions SIGNING_* secrets.
-The original identity is in /root/.local/share/y700-launcher-plus on puli-home-pve.
+The permanent identity is managed inside PVE CT 9102 (android-keystore).
 The script never generates or replaces an existing signing key.
 EOF
 }
