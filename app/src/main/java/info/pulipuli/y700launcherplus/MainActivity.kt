@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Panel { HOME, DRAWER, SETTINGS, HIDDEN }
+private enum class Panel { HOME, DRAWER, SETTINGS, HIDDEN, DOCK }
 
 @Composable
 private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
@@ -107,7 +107,11 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
     var query by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(catalogRevision) {
         catalog = withContext(Dispatchers.IO) { loadLaunchableApps(context) }
-        if (storedLayout == null) storedLayout = LauncherLayout.load(preferences, catalog)
+        if (storedLayout == null) {
+            val firstLaunch = !preferences.contains("layout_v1") && !preferences.contains("pinned_packages")
+            storedLayout = LauncherLayout.load(preferences, catalog)
+            if (firstLaunch) panel = Panel.DOCK
+        }
     }
     LaunchedEffect(homeRevision) {
         if (homeRevision > 0) {
@@ -130,7 +134,10 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
                 Text(stringResource(R.string.loading_apps), Modifier.padding(16.dp))
                 return@Column
             }
-            val pager = rememberPagerState { layout.pages.size }
+            val pager = rememberPagerState(initialPage = layout.defaultPage) { layout.pages.size }
+            LaunchedEffect(homeRevision) {
+                if (homeRevision > 0) pager.scrollToPage(layout.defaultPage)
+            }
             val scope = rememberCoroutineScope()
             val apps = remember(catalog) { catalog.associateBy { it.packageName } }
 
@@ -177,6 +184,7 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
                     Text(stringResource(when (panel) {
                         Panel.DRAWER -> R.string.all_apps
                         Panel.HIDDEN -> R.string.hidden_apps
+                        Panel.DOCK -> R.string.launcher_dock
                         else -> R.string.settings
                     }))
                 }
@@ -252,7 +260,7 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
                             (app.label.contains(search, ignoreCase = true) ||
                                 app.packageName.contains(search, ignoreCase = true))
                     }
-                    AppGrid(filtered, 0, Modifier.weight(1f), R.string.no_search_results) { app ->
+                    AppGrid(filtered, layout.drawerColumns, Modifier.weight(1f), R.string.no_search_results) { app ->
                         val packageName = app.packageName
                         val page = pager.currentPage
                         val packages = layout.pages[page]
@@ -280,11 +288,17 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
                         }
                     }
                 }
+                Panel.DOCK -> DockSettings(catalog, layout, ::update) { panel = Panel.HOME }
                 Panel.SETTINGS -> {
                     LayoutSettings(
                         layout = layout,
                         update = ::update,
                         showHidden = { panel = Panel.HIDDEN },
+                        showDock = { panel = Panel.DOCK },
+                        managePages = { next ->
+                            pager.requestScrollToPage(next.defaultPage)
+                            update(next)
+                        },
                         addPage = {
                             val nextPage = layout.pages.size
                             update(layout.copy(pages = layout.pages + listOf(emptyList())))
@@ -292,14 +306,10 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
                             pager.requestScrollToPage(nextPage)
                         },
                         restore = { restored ->
-                            pager.requestScrollToPage(0)
+                            pager.requestScrollToPage(restored.defaultPage)
                             update(restored)
-                        },
-                        removeLastPage = {
-                            val lastPage = layout.pages.lastIndex
-                            if (pager.currentPage == lastPage) pager.requestScrollToPage(lastPage - 1)
-                            update(layout.copy(pages = layout.pages.dropLast(1)))
                         }
+
                     )
                 }
             }

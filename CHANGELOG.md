@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 2026-11-07: Implemented home-page reorder, confirmed deletion and default HOME selection; the default follows its content when pages move. Added first-run launcher Dock setup with searchable selection, reorder and removal, and independent drawer columns. The Dock explanation explicitly distinguishes the ZUI system taskbar.
+- Layout JSON v2 adds defaultPage and drawerColumns while retaining v1 import and the existing preferences key. Added 11 JVM regression tests for page operations and backup migration/validation; Actions now runs these before APK/lint publication. Build/device verification pending at implementation time; no emulator used.
+
+
 - 2026-11-07: Require the CT 9102 permanent certificate for every published sideload APK, remove the CI test-key fallback, and compare the built APK certificate before publication. Verified the existing launcher-latest APK checksum and certificate against CT 9102 (Actions run 42308372590).
 
 - Set the supplied 512×512 PNG as the app and round launcher icon.

@@ -6,7 +6,7 @@ The app is a non-root Android HOME launcher. It uses only public Android APIs an
 
 - Queries activities that declare the standard MAIN/LAUNCHER intent, using a narrow manifest package-visibility query.
 - Refreshes the package catalog when HOME resumes. The drawer offers search and hidden-app filtering.
-- Stores ordered home pages, dock shortcuts, hidden apps and grid settings as one versioned layout in app-private preferences. Older pin sets migrate to page one.
+- Stores ordered home pages, dock shortcuts, hidden apps and grid settings and the default home page as one versioned layout in app-private preferences. Older pin sets migrate to page one. JSON v2 reads v1 backups with defaults for the new fields; the existing layout_v1 preference key is retained. Page mutations preserve the default page by content identity, not by its old index.
 - Leaves system navigation and the native ZUI taskbar owned by Android/ZUI.
 
 The package/application ID is `info.pulipuli.y700launcherplus` and must remain stable for sideloaded updates.

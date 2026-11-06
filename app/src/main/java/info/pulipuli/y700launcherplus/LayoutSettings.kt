@@ -42,7 +42,8 @@ internal fun LayoutSettings(
     update: (LauncherLayout) -> Unit,
     showHidden: () -> Unit,
     addPage: () -> Unit,
-    removeLastPage: () -> Unit,
+    showDock: () -> Unit,
+    managePages: (LauncherLayout) -> Unit,
     restore: (LauncherLayout) -> Unit
 ) {
     var columnsExpanded by remember { mutableStateOf(false) }
@@ -78,9 +79,9 @@ internal fun LayoutSettings(
         Button(onClick = addPage, enabled = layout.pages.size < LauncherLayout.MAX_PAGES) {
             Text(stringResource(R.string.add_page))
         }
-        OutlinedButton(onClick = removeLastPage, enabled = layout.pages.size > 1 && layout.pages.last().isEmpty()) {
-            Text(stringResource(R.string.remove_empty_last_page))
-        }
+        PageSettings(layout, managePages)
+        OutlinedButton(onClick = showDock) { Text(stringResource(R.string.launcher_dock)) }
+        ColumnSetting(layout.drawerColumns) { update(layout.copy(drawerColumns = it)) }
         OutlinedButton(onClick = showHidden) { Text(stringResource(R.string.hidden_apps)) }
         BackupControls(layout, restore)
     }

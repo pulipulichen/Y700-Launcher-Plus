@@ -34,4 +34,18 @@
     <string name="import_backup">匯入版面備份</string>
     <string name="confirm_restore">要以備份取代目前的桌面分頁、常駐列、隱藏清單和格線設定嗎？</string>
     <string name="restore">還原</string>
+    <string name="manage_pages">管理桌面頁面</string>
+    <string name="page_summary">第 %1$d 頁 · %2$d 個 App</string>
+    <string name="default_page">預設首頁</string>
+    <string name="set_default_page">設為預設首頁</string>
+    <string name="delete_page">刪除頁面</string>
+    <string name="confirm_delete_page">刪除第 %1$d 頁及其 %2$d 個捷徑？不會解除安裝 App。此操作無法復原。</string>
+    <string name="launcher_dock">啟動器 Dock</string>
+    <string name="dock_explanation">選擇 Launcher Plus Dock 要顯示的 App，變更會自動儲存。這個 Dock 只顯示在本啟動器桌面；ZUI 原生工具列請另外在系統設定中調整。</string>
+    <string name="dock_count">已選擇 %1$d / %2$d 個 App</string>
+    <string name="dock_selected">已選擇的 App（依顯示順序）</string>
+    <string name="move_earlier">向前移</string>
+    <string name="move_later">向後移</string>
+    <string name="done">完成</string>
+    <string name="drawer_columns">App 抽屜欄數</string>
 </resources>

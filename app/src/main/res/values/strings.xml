@@ -34,4 +34,18 @@
     <string name="import_backup">Import layout backup</string>
     <string name="confirm_restore">Replace the current pages, dock, hidden apps and grid settings with this backup?</string>
     <string name="restore">Restore</string>
+    <string name="manage_pages">Manage home pages</string>
+    <string name="page_summary">Page %1$d · %2$d apps</string>
+    <string name="default_page">Default home page</string>
+    <string name="set_default_page">Set as default</string>
+    <string name="delete_page">Delete page</string>
+    <string name="confirm_delete_page">Delete page %1$d and its %2$d shortcuts? Apps remain installed. This cannot be undone.</string>
+    <string name="launcher_dock">Launcher dock</string>
+    <string name="dock_explanation">Choose apps for the Launcher Plus dock. Changes save automatically. This dock appears on this home screen; the ZUI system taskbar is configured separately in system settings.</string>
+    <string name="dock_count">%1$d / %2$d apps selected</string>
+    <string name="dock_selected">Selected apps (in order)</string>
+    <string name="move_earlier">Move earlier</string>
+    <string name="move_later">Move later</string>
+    <string name="done">Done</string>
+    <string name="drawer_columns">App drawer columns</string>
 </resources>

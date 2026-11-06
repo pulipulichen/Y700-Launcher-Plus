@@ -68,7 +68,7 @@ jobs:
           [[ "$fp" == '8F:4C:5A:D0:18:AA:5F:E5:32:C4:F1:FF:12:60:EF:08:02:82:48:9D:C6:D2:03:2A:5E:BD:62:AF:18:EE:54:B3' ]] || { echo "::error::Permanent key fingerprint mismatch."; exit 1; }
           echo "Using verified permanent signing certificate."
           version_code=$(( $(date -u +%s) / 60 ))
-          gradle --no-daemon --console=plain -PappVersionCode="$version_code" :app:assembleDebug :app:lintDebug
+          gradle --no-daemon --console=plain -PappVersionCode="$version_code" :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
       - name: Prepare release assets
         shell: bash
         run: |
