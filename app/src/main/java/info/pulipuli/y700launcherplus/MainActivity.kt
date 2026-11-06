@@ -1,296 +1,367 @@
 package info.pulipuli.y700launcherplus
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private data class LauncherApp(
-    val packageName: String,
-    val label: String,
-    val icon: ImageBitmap
-)
-
 class MainActivity : ComponentActivity() {
+    private var catalogRevision by mutableIntStateOf(0)
+    private var homeRevision by mutableIntStateOf(0)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                LauncherScreen()
+            val dark = isSystemInDarkTheme()
+            val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (dark) dynamicDarkColorScheme(this) else dynamicLightColorScheme(this)
+            } else {
+                if (dark) darkColorScheme() else lightColorScheme()
+            }
+            MaterialTheme(colorScheme = colors) {
+                LauncherScreen(catalogRevision, homeRevision)
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        catalogRevision++
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.hasCategory(Intent.CATEGORY_HOME)) homeRevision++
+    }
 }
 
-@androidx.compose.runtime.Composable
-private fun LauncherScreen() {
+private enum class Panel { HOME, DRAWER, SETTINGS, HIDDEN }
+
+@Composable
+private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
     val context = LocalContext.current
-    var apps by remember { mutableStateOf(emptyList<LauncherApp>()) }
-    var pinnedPackages by remember { mutableStateOf(emptySet<String>()) }
-    var searchText by rememberSaveable { mutableStateOf("") }
-    var showAllApps by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        val loadedApps = withContext(Dispatchers.IO) {
-            loadLaunchableApps(context)
-        }
-        apps = loadedApps
-        val preferences = context.getSharedPreferences("launcher", Context.MODE_PRIVATE)
-        val savedPins = preferences.getStringSet("pinned_packages", null)
-        pinnedPackages = savedPins?.toSet()
-            ?: loadedApps.take(8).map { it.packageName }.toSet()
-        if (savedPins == null) {
-            preferences.edit().putStringSet("pinned_packages", pinnedPackages).apply()
-        }
-    }
-
-    val normalizedQuery = searchText.trim()
-    val visibleApps = apps
-        .filter { app ->
-            (showAllApps || normalizedQuery.isNotEmpty() || app.packageName in pinnedPackages) &&
-                (normalizedQuery.isEmpty() || app.label.contains(normalizedQuery, ignoreCase = true))
-        }
-        .sortedBy { it.label.lowercase() }
-
-    fun togglePin(app: LauncherApp) {
-        val updatedPins = pinnedPackages.toMutableSet()
-        if (!updatedPins.add(app.packageName)) updatedPins.remove(app.packageName)
-        pinnedPackages = updatedPins
+    val preferences = remember(context) {
         context.getSharedPreferences("launcher", Context.MODE_PRIVATE)
-            .edit()
-            .putStringSet("pinned_packages", updatedPins)
-            .apply()
     }
-
-    fun launchApp(app: LauncherApp) {
-        val launchIntent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-        if (launchIntent != null) context.startActivity(launchIntent)
+    var catalog by remember { mutableStateOf(emptyList<LauncherApp>()) }
+    var storedLayout by remember { mutableStateOf<LauncherLayout?>(null) }
+    var panel by rememberSaveable { mutableStateOf(Panel.HOME) }
+    var query by rememberSaveable { mutableStateOf("") }
+    LaunchedEffect(catalogRevision) {
+        catalog = withContext(Dispatchers.IO) { loadLaunchableApps(context) }
+        if (storedLayout == null) storedLayout = LauncherLayout.load(preferences, catalog)
+    }
+    LaunchedEffect(homeRevision) {
+        if (homeRevision > 0) {
+            panel = Panel.HOME
+            query = ""
+        }
+    }
+    BackHandler(panel != Panel.HOME) {
+        panel = if (panel == Panel.HIDDEN) Panel.SETTINGS else Panel.HOME
+        query = ""
     }
 
     Scaffold { insets ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(insets)
-                .padding(horizontal = 32.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+            Modifier.fillMaxSize().padding(insets).padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.launcher_subtitle),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                if (showAllApps) {
-                    OutlinedButton(onClick = { showAllApps = false }) {
-                        Text(stringResource(R.string.home))
-                    }
-                } else {
-                    Button(onClick = { showAllApps = true }) {
-                        Text(stringResource(R.string.all_apps))
-                    }
+            val layout = storedLayout
+            if (layout == null) {
+                Text(stringResource(R.string.loading_apps), Modifier.padding(16.dp))
+                return@Column
+            }
+            val pager = rememberPagerState { layout.pages.size }
+            val scope = rememberCoroutineScope()
+            val apps = remember(catalog) { catalog.associateBy { it.packageName } }
+
+            fun update(next: LauncherLayout) {
+                next.save(preferences)
+                storedLayout = next
+            }
+
+            fun setPageApps(index: Int, packages: List<String>) {
+                update(layout.copy(pages = layout.pages.toMutableList().apply { set(index, packages) }))
+            }
+
+            fun open(app: LauncherApp) {
+                val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                try {
+                    if (intent == null) throw ActivityNotFoundException()
+                    context.startActivity(intent)
+                    panel = Panel.HOME
+                    query = ""
+                } catch (_: ActivityNotFoundException) {
+                    Toast.makeText(context, R.string.app_unavailable, Toast.LENGTH_SHORT).show()
+                } catch (_: SecurityException) {
+                    Toast.makeText(context, R.string.app_unavailable, Toast.LENGTH_SHORT).show()
                 }
             }
 
-            TextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                label = { Text(stringResource(R.string.search_apps)) },
-                placeholder = { Text(stringResource(R.string.search_hint)) },
-                colors = TextFieldDefaults.colors()
-            )
-
-            Text(
-                text = if (showAllApps || normalizedQuery.isNotEmpty()) {
-                    stringResource(R.string.all_apps)
-                } else {
-                    stringResource(R.string.pinned_apps)
-                },
-                style = MaterialTheme.typography.titleLarge
-            )
-
-            if (apps.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.loading_apps),
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else if (visibleApps.isEmpty()) {
-                Text(
-                    text = if (normalizedQuery.isNotEmpty()) {
-                        stringResource(R.string.no_search_results)
-                    } else {
-                        stringResource(R.string.no_pinned_apps)
-                    },
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 124.dp),
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    items(visibleApps, key = { it.packageName }) { app ->
-                        AppTile(
-                            app = app,
-                            isPinned = app.packageName in pinnedPackages,
-                            onLaunch = { launchApp(app) },
-                            onTogglePin = { togglePin(app) }
-                        )
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (panel == Panel.HOME) {
+                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge)
+                    TextButton(onClick = { panel = Panel.SETTINGS }) {
+                        Text(stringResource(R.string.settings))
                     }
+                } else {
+                    TextButton(onClick = {
+                        panel = if (panel == Panel.HIDDEN) Panel.SETTINGS else Panel.HOME
+                        query = ""
+                    }) {
+                        Text(stringResource(if (panel == Panel.HIDDEN) R.string.settings else R.string.home))
+                    }
+                    Text(stringResource(when (panel) {
+                        Panel.DRAWER -> R.string.all_apps
+                        Panel.HIDDEN -> R.string.hidden_apps
+                        else -> R.string.settings
+                    }))
+                }
+            }
+
+            when (panel) {
+                Panel.HOME -> {
+                    HorizontalPager(state = pager, modifier = Modifier.weight(1f)) { page ->
+                        val packages = layout.pages[page]
+                        AppGrid(packages.mapNotNull(apps::get), layout.columns, Modifier.fillMaxSize(),
+                            R.string.no_pinned_apps) { app ->
+                            AppTile(app, layout.showLabels, { open(app) }) { close ->
+                                AppMenuItem(R.string.remove_from_home, close) {
+                                    setPageApps(page, packages - app.packageName)
+                                }
+                                val destinations = listOf(
+                                    page - 1 to R.string.move_previous_page,
+                                    page + 1 to R.string.move_next_page
+                                )
+                                for ((destination, label) in destinations) {
+                                    if (destination !in layout.pages.indices) continue
+                                    AppMenuItem(label, close) {
+                                        val pages = layout.pages.toMutableList()
+                                        pages[page] = packages - app.packageName
+                                        if (app.packageName !in pages[destination]) {
+                                            pages[destination] = pages[destination] + app.packageName
+                                        }
+                                        update(layout.copy(pages = pages))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Row(Modifier.align(Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(enabled = pager.currentPage > 0, onClick = {
+                            scope.launch { pager.animateScrollToPage(pager.currentPage - 1) }
+                        }) { Text(stringResource(R.string.previous_page)) }
+                        Text(stringResource(R.string.page_counter, pager.currentPage + 1, layout.pages.size))
+                        TextButton(enabled = pager.currentPage + 1 < layout.pages.size, onClick = {
+                            scope.launch { pager.animateScrollToPage(pager.currentPage + 1) }
+                        }) { Text(stringResource(R.string.next_page)) }
+                    }
+
+                    Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.surfaceVariant) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            LazyRow(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(layout.dock.mapNotNull(apps::get), key = { it.packageName }) { app ->
+                                    AppTile(app, false, { open(app) }, Modifier.size(48.dp)) { close ->
+                                        AppMenuItem(R.string.remove_from_dock, close) {
+                                            update(layout.copy(dock = layout.dock - app.packageName))
+                                        }
+                                    }
+                                }
+                            }
+                            Button(onClick = { panel = Panel.DRAWER }) {
+                                Text(stringResource(R.string.all_apps))
+                            }
+                        }
+                    }
+                }
+                Panel.DRAWER, Panel.HIDDEN -> {
+                    val hiddenPanel = panel == Panel.HIDDEN
+                    OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.search_apps)) }, singleLine = true)
+                    val search = query.trim()
+                    val filtered = catalog.filter { app ->
+                        (app.packageName in layout.hidden) == hiddenPanel &&
+                            (app.label.contains(search, ignoreCase = true) ||
+                                app.packageName.contains(search, ignoreCase = true))
+                    }
+                    AppGrid(filtered, 0, Modifier.weight(1f), R.string.no_search_results) { app ->
+                        val packageName = app.packageName
+                        val page = pager.currentPage
+                        val packages = layout.pages[page]
+                        AppTile(app, true, { open(app) }) { close ->
+                            if (hiddenPanel) {
+                                AppMenuItem(R.string.show_in_drawer, close) {
+                                    update(layout.copy(hidden = layout.hidden - packageName))
+                                }
+                            } else {
+                                if (packageName !in packages) {
+                                    AppMenuItem(R.string.add_to_home, close) {
+                                        setPageApps(page, packages + packageName)
+                                    }
+                                }
+                                if (packageName !in layout.dock) {
+                                    AppMenuItem(R.string.add_to_dock, close,
+                                        enabled = layout.dock.size < LauncherLayout.MAX_DOCK_APPS) {
+                                        update(layout.copy(dock = layout.dock + packageName))
+                                    }
+                                }
+                                AppMenuItem(R.string.hide_from_drawer, close) {
+                                    update(layout.copy(hidden = layout.hidden + packageName))
+                                }
+                            }
+                        }
+                    }
+                }
+                Panel.SETTINGS -> {
+                    LayoutSettings(
+                        layout = layout,
+                        update = ::update,
+                        showHidden = { panel = Panel.HIDDEN },
+                        addPage = {
+                            val nextPage = layout.pages.size
+                            update(layout.copy(pages = layout.pages + listOf(emptyList())))
+                            panel = Panel.HOME
+                            pager.requestScrollToPage(nextPage)
+                        },
+                        removeLastPage = {
+                            val lastPage = layout.pages.lastIndex
+                            if (pager.currentPage == lastPage) pager.requestScrollToPage(lastPage - 1)
+                            update(layout.copy(pages = layout.pages.dropLast(1)))
+                        }
+                    )
                 }
             }
         }
     }
 }
 
-@androidx.compose.runtime.Composable
+@Composable
+private fun AppGrid(
+    apps: List<LauncherApp>,
+    columns: Int,
+    modifier: Modifier,
+    emptyText: Int,
+    tile: @Composable (LauncherApp) -> Unit
+) {
+    if (apps.isEmpty()) {
+        Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            Text(stringResource(emptyText), textAlign = TextAlign.Center)
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = if (columns == 0) GridCells.Adaptive(96.dp) else GridCells.Fixed(columns),
+            modifier = modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(apps, key = { it.packageName }) { tile(it) }
+        }
+    }
+}
+
+@Composable
 private fun AppTile(
     app: LauncherApp,
-    isPinned: Boolean,
-    onLaunch: () -> Unit,
-    onTogglePin: () -> Unit
+    showLabel: Boolean,
+    open: () -> Unit,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    menu: @Composable (close: () -> Unit) -> Unit
 ) {
-    Card {
+    var expanded by remember { mutableStateOf(false) }
+    val options = stringResource(R.string.app_options)
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(144.dp)
-                .padding(12.dp),
+            modifier.heightIn(min = 48.dp)
+                .combinedClickable(onClick = open, onLongClickLabel = options, onLongClick = { expanded = true })
+                .then(if (showLabel) Modifier else Modifier.semantics { contentDescription = app.label })
+                .padding(horizontal = 4.dp, vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Center
         ) {
-            Surface(
-                onClick = onLaunch,
-                color = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        bitmap = app.icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = app.label,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-            OutlinedButton(
-                onClick = onTogglePin,
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp)
-            ) {
-                Text(
-                    stringResource(
-                        if (isPinned) R.string.remove_from_home else R.string.add_to_home
-                    )
-                )
-            }
+            Image(app.icon, contentDescription = null, modifier = Modifier.size(if (showLabel) 44.dp else 36.dp))
+            if (showLabel) Text(app.label, style = MaterialTheme.typography.labelMedium,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
+            menu { expanded = false }
         }
     }
 }
 
-private fun loadLaunchableApps(context: Context): List<LauncherApp> {
-    val packageManager = context.packageManager
-    val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-    val activities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        packageManager.queryIntentActivities(
-            launcherIntent,
-            PackageManager.ResolveInfoFlags.of(0L)
-        )
-    } else {
-        @Suppress("DEPRECATION")
-        packageManager.queryIntentActivities(launcherIntent, 0)
-    }
-
-    return activities.mapNotNull { resolveInfo ->
-        val packageName = resolveInfo.activityInfo?.packageName ?: return@mapNotNull null
-        if (packageName == context.packageName) return@mapNotNull null
-        val label = resolveInfo.loadLabel(packageManager)?.toString()?.takeIf { it.isNotBlank() }
-            ?: return@mapNotNull null
-        val bitmap = resolveInfo.loadIcon(packageManager).toBitmap().asImageBitmap()
-        LauncherApp(packageName, label, bitmap)
-    }.distinctBy { it.packageName }
-}
-
-private fun Drawable.toBitmap(): Bitmap {
-    val width = intrinsicWidth.coerceAtLeast(1)
-    val height = intrinsicHeight.coerceAtLeast(1)
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bitmap)
-    setBounds(0, 0, canvas.width, canvas.height)
-    draw(canvas)
-    return bitmap
+@Composable
+private fun AppMenuItem(label: Int, close: () -> Unit, enabled: Boolean = true, action: () -> Unit) {
+    DropdownMenuItem(text = { Text(stringResource(label)) }, enabled = enabled, onClick = {
+        close()
+        action()
+    })
 }

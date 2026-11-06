@@ -4,10 +4,10 @@ A personal, non-root Android HOME launcher for Lenovo Legion Y700 tablets. The f
 
 ## Current build
 
-- Adaptive app grid with search.
-- Pinned apps saved on device; first run pins up to eight launchable apps.
-- Launch apps directly from the custom HOME screen.
-- Original ZUI taskbar remains owned by ZUI and was visible in the supplied device screenshot.
+- Separate home pages, searchable app drawer, and an optional set of pinned dock shortcuts.
+- Swipe between pages. Long-press icons to place, move, remove, or hide them.
+- Change home grid columns and labels in Settings. Existing home pins are migrated on upgrade.
+- The native ZUI taskbar is controlled by ZUI. See the Phase 0 findings and the current device acceptance checklist.
 - Traditional Chinese and English interface strings.
 - No Root access, privileged permissions, or proprietary ZUI APIs.
 
@@ -15,6 +15,6 @@ The app is for personal use and sideloading. GitHub Actions compiles and lints a
 
 Sideload builds from GitHub Actions use a fixed test keystore supplied by the repository secret `Y700_TEST_KEYSTORE_BASE64`. Its PKCS12 alias is `androiddebugkey` and its temporary test password is `android`. If an older APK uses a different certificate, Android requires a one-time reinstall, which clears app data. Keep the same keystore for subsequent updates.
 
-See [Phase 0 device checks](docs/PHASE0.md) and [architecture](docs/ARCHITECTURE.md).
+See [Phase 0 device checks](docs/PHASE0.md) [architecture](docs/ARCHITECTURE.md), and the [Nova feature roadmap](docs/NOVA-PARITY.md).
 
 Independent project; not affiliated with Lenovo. ZUI, Legion and Y700 are trademarks of their respective owners.

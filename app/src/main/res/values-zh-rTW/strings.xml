@@ -1,14 +1,30 @@
 <resources>
     <string name="app_name">Y700 Launcher Plus</string>
-    <string name="launcher_subtitle">常用應用，隨時開啟</string>
     <string name="all_apps">所有應用程式</string>
     <string name="home">桌面</string>
     <string name="search_apps">搜尋應用程式</string>
-    <string name="search_hint">輸入應用程式名稱</string>
-    <string name="pinned_apps">已釘選</string>
     <string name="loading_apps">正在載入應用程式…</string>
     <string name="no_search_results">找不到符合的應用程式</string>
     <string name="no_pinned_apps">尚未釘選應用程式</string>
     <string name="add_to_home">加入桌面</string>
     <string name="remove_from_home">移除</string>
+    <string name="settings">設定</string>
+    <string name="hidden_apps">已隱藏的應用程式</string>
+    <string name="app_unavailable">無法開啟此應用程式</string>
+    <string name="app_options">開啟應用程式選單</string>
+    <string name="add_to_dock">加入啟動器常駐列</string>
+    <string name="remove_from_dock">從啟動器常駐列移除</string>
+    <string name="hide_from_drawer">從應用程式抽屜隱藏</string>
+    <string name="show_in_drawer">在應用程式抽屜顯示</string>
+    <string name="home_columns">桌面格線欄數</string>
+    <string name="show_labels">顯示桌面應用程式名稱</string>
+    <string name="automatic">自動</string>
+    <string name="column_count">%1$d 欄</string>
+    <string name="add_page">新增桌面分頁</string>
+    <string name="remove_empty_last_page">移除最後一個空白分頁</string>
+    <string name="previous_page">上一頁</string>
+    <string name="next_page">下一頁</string>
+    <string name="page_counter">第 %1$d 頁，共 %2$d 頁</string>
+    <string name="move_next_page">移至下一頁</string>
+    <string name="move_previous_page">移至上一頁</string>
 </resources>
