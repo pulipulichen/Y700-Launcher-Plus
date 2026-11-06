@@ -10,6 +10,6 @@ An independent Android HOME launcher for Lenovo Legion Y700 tablets. Phase 0 tes
 
 ## Development
 
-Android Studio, JDK 17, Android SDK 36. The Gradle Wrapper and CI build workflow are not yet committed; this scaffold has not been compiled. See [Phase 0 test plan](docs/PHASE0.md), [architecture](docs/ARCHITECTURE.md), and [Google Play checklist](GOOGLE_PLAY.md).
+The Phase 0 workflow at `.github/workflows/android-phase0.yml` uses JDK 17, Android SDK 36, and Gradle 8.13. It compiles and lints the debug app on relevant `main` changes and manual dispatch, then publishes the APK and SHA-256 checksum to the `phase0-latest` prerelease. The first CI run and device behavior are pending. CI installs Gradle directly; a Gradle Wrapper is not committed.
 
 Independent project; not affiliated with Lenovo. ZUI, Legion and Y700 are trademarks of their respective owners.
