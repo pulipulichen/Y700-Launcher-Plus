@@ -1,4 +1,4 @@
-name: Phase 0 Android build
+name: Y700 Launcher Android build
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-phase0-${{ github.ref }}
+  group: android-launcher-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -54,23 +54,23 @@ jobs:
       - name: Prepare release assets
         shell: bash
         run: |
-          apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-phase0-debug.apk"
+          apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
           test -s app/build/outputs/apk/debug/app-debug.apk
           cp app/build/outputs/apk/debug/app-debug.apk "$apk_path"
           sha256sum "$apk_path" > "$apk_path.sha256"
 
-      - name: Publish Phase 0 prerelease
+      - name: Publish latest sideload APK
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          release_tag="phase0-latest"
-          apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-phase0-debug.apk"
+          release_tag="launcher-latest"
+          apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
           checksum_path="$apk_path.sha256"
-          release_notes="Current Phase 0 debug APK for on-device ZUI taskbar testing. Source commit: $GITHUB_SHA; Actions run: $GITHUB_RUN_ID."
+          release_notes="Current personal-use debug APK. Source commit: $GITHUB_SHA; Actions run: $GITHUB_RUN_ID."
           if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$release_tag" "$apk_path" "$checksum_path" --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit "$release_tag" --repo "$GITHUB_REPOSITORY" --title "Y700 Launcher Plus Phase 0 (latest)" --notes "$release_notes" --prerelease
+            gh release edit "$release_tag" --repo "$GITHUB_REPOSITORY" --title "Y700 Launcher Plus (latest)" --notes "$release_notes" --prerelease
           else
-            gh release create "$release_tag" "$apk_path" "$checksum_path" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Y700 Launcher Plus Phase 0 (latest)" --notes "$release_notes" --prerelease
+            gh release create "$release_tag" "$apk_path" "$checksum_path" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Y700 Launcher Plus (latest)" --notes "$release_notes" --prerelease
           fi

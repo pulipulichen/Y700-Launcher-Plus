@@ -1,1 +1,15 @@
-<resources><string name="app_name">Y700 Launcher Plus</string></resources>
+<resources>
+    <string name="app_name">Y700 Launcher Plus</string>
+    <string name="launcher_subtitle">Your apps, ready when you are</string>
+    <string name="all_apps">All apps</string>
+    <string name="home">Home</string>
+    <string name="search_apps">Search apps</string>
+    <string name="search_hint">Type an app name</string>
+    <string name="pinned_apps">Pinned apps</string>
+    <string name="loading_apps">Loading apps…</string>
+    <string name="no_search_results">No matching apps</string>
+    <string name="no_pinned_apps">No apps pinned yet</string>
+    <string name="add_to_home">Add to home</string>
+    <string name="remove_from_home">Remove</string>
+    <string name="taskbar_hint">Your original ZUI taskbar stays available below</string>
+</resources>

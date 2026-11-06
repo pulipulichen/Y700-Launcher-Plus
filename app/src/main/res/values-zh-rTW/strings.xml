@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Y700 Launcher Plus</string>
+    <string name="launcher_subtitle">常用應用，隨時開啟</string>
+    <string name="all_apps">所有應用程式</string>
+    <string name="home">桌面</string>
+    <string name="search_apps">搜尋應用程式</string>
+    <string name="search_hint">輸入應用程式名稱</string>
+    <string name="pinned_apps">已釘選</string>
+    <string name="loading_apps">正在載入應用程式…</string>
+    <string name="no_search_results">找不到符合的應用程式</string>
+    <string name="no_pinned_apps">尚未釘選應用程式</string>
+    <string name="add_to_home">加入桌面</string>
+    <string name="remove_from_home">移除</string>
+    <string name="taskbar_hint">原有的 ZUI 工具列會留在畫面底部</string>
+</resources>
