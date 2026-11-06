@@ -23,7 +23,6 @@ Secrets management: https://github.com/pulipulichen/Y700-Launcher-Plus/settings/
 
 Run from a clone of this repository **inside CT 9102**, where `gh auth login` is already completed:
 
-    export Y700_SIGNING_DIR=/root/.local/share/y700-launcher-plus
     ./keystore/setup.sh --verify
     ./keystore/setup.sh --sync-github
 
@@ -31,7 +30,7 @@ On 2026-11-06 the permanent signing identity was safely moved from the PVE host 
 
 ## Avoid breaking installed apps
 
-Existing Y700 APKs were previously signed with the temporary Y700_TEST_KEYSTORE_BASE64 secret. The four `SIGNING_*` secrets are now installed, so subsequent debug CI builds use the permanent certificate. The fixed test identity remains a fallback only when all permanent secrets are absent; partial `SIGNING_*` configurations cause explicit failure. The release AAB workflow requires the permanent identity without fallback.
+The sideload APK and Play upload AAB workflows require all four permanent signing secrets. The sideload workflow verifies the built APK against the pinned certificate before publishing it. Earlier Y700 APKs used the temporary test certificate.
 
 Switching to the permanent signature cannot update APKs installed with the earlier test certificate in place. Export the launcher layout, uninstall the old test-signed app, then install the permanently signed APK after verifying the CI build. This migration is one time only.
 

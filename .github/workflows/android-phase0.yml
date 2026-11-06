@@ -50,35 +50,23 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          Y700_TEST_KEYSTORE_BASE64: ${{ secrets.Y700_TEST_KEYSTORE_BASE64 }}
         shell: bash
         run: |
           set -euo pipefail
           umask 077
-          trap 'rm -f signing/release.keystore signing/signing.properties "$RUNNER_TEMP"/y700-test.*.p12' EXIT
-          if [[ -n "$SIGNING_KEYSTORE_BASE64$SIGNING_STORE_PASSWORD$SIGNING_KEY_PASSWORD$SIGNING_KEY_ALIAS" ]]; then
-            if [[ -z "$SIGNING_KEYSTORE_BASE64" || -z "$SIGNING_STORE_PASSWORD" || -z "$SIGNING_KEY_PASSWORD" || -z "$SIGNING_KEY_ALIAS" ]]; then
-              echo "::error::Incomplete SIGNING_* secret set; refusing certificate fallback."
-              exit 1
-            fi
-            mkdir -p signing
-            printf '%s' "$SIGNING_KEYSTORE_BASE64" | base64 --decode > signing/release.keystore
-            test -s signing/release.keystore
-            printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\n' "$SIGNING_STORE_PASSWORD" "$SIGNING_KEY_PASSWORD" "$SIGNING_KEY_ALIAS" > signing/signing.properties
-            keytool -list -keystore signing/release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" >/dev/null
-            fp="$(keytool -exportcert -rfc -keystore signing/release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" 2>/dev/null | openssl x509 -noout -fingerprint -sha256 | cut -d= -f2)"
-            [[ "$fp" == '8F:4C:5A:D0:18:AA:5F:E5:32:C4:F1:FF:12:60:EF:08:02:82:48:9D:C6:D2:03:2A:5E:BD:62:AF:18:EE:54:B3' ]] || { echo "::error::Permanent key fingerprint mismatch."; exit 1; }
-            echo "Using verified permanent signing certificate."
-          elif [[ -n "$Y700_TEST_KEYSTORE_BASE64" ]]; then
-            export Y700_TEST_KEYSTORE_PATH
-            Y700_TEST_KEYSTORE_PATH="$(mktemp "$RUNNER_TEMP/y700-test.XXXXXXXX.p12")"
-            printf '%s' "$Y700_TEST_KEYSTORE_BASE64" | base64 --decode > "$Y700_TEST_KEYSTORE_PATH"
-            test -s "$Y700_TEST_KEYSTORE_PATH"
-            echo "::warning::Still using the original temporary Y700 test certificate."
-          else
-            echo "::error::Missing complete SIGNING_* credentials and legacy Y700_TEST_KEYSTORE_BASE64."
+          trap 'rm -f signing/release.keystore signing/signing.properties' EXIT
+          if [[ -z "$SIGNING_KEYSTORE_BASE64" || -z "$SIGNING_STORE_PASSWORD" || -z "$SIGNING_KEY_PASSWORD" || -z "$SIGNING_KEY_ALIAS" ]]; then
+            echo "::error::All four SIGNING_* secrets are required."
             exit 1
           fi
+          mkdir -p signing
+          printf '%s' "$SIGNING_KEYSTORE_BASE64" | base64 --decode > signing/release.keystore
+          test -s signing/release.keystore
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\n' "$SIGNING_STORE_PASSWORD" "$SIGNING_KEY_PASSWORD" "$SIGNING_KEY_ALIAS" > signing/signing.properties
+          keytool -list -keystore signing/release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" >/dev/null
+          fp="$(keytool -exportcert -rfc -keystore signing/release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" 2>/dev/null | openssl x509 -noout -fingerprint -sha256 | cut -d= -f2)"
+          [[ "$fp" == '8F:4C:5A:D0:18:AA:5F:E5:32:C4:F1:FF:12:60:EF:08:02:82:48:9D:C6:D2:03:2A:5E:BD:62:AF:18:EE:54:B3' ]] || { echo "::error::Permanent key fingerprint mismatch."; exit 1; }
+          echo "Using verified permanent signing certificate."
           version_code=$(( $(date -u +%s) / 60 ))
           gradle --no-daemon --console=plain -PappVersionCode="$version_code" :app:assembleDebug :app:lintDebug
       - name: Prepare release assets
@@ -87,7 +75,13 @@ jobs:
           set -euo pipefail
           apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
           test -s app/build/outputs/apk/debug/app-debug.apk
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
+          certs=$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk)
+          printf '%s\n' "$certs"
+          digest=$(printf '%s\n' "$certs" | sed -n 's/^Signer #[0-9]* certificate SHA-256 digest: //p')
+          if [[ "$digest" != '8f4c5ad018aa5fe532c4f1ff1260ef080282489dc6d2032a5ebd62af18ee54b3' ]]; then
+            echo "::error::Built APK does not have the expected permanent signing certificate."
+            exit 1
+          fi
           cp app/build/outputs/apk/debug/app-debug.apk "$apk_path"
           (cd "$RUNNER_TEMP" && sha256sum Y700-Launcher-Plus-debug.apk > Y700-Launcher-Plus-debug.apk.sha256)
       - name: Publish latest sideload APK

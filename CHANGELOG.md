@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 2026-11-07: Require the CT 9102 permanent certificate for every published sideload APK, remove the CI test-key fallback, and compare the built APK certificate before publication. Verified the existing launcher-latest APK checksum and certificate against CT 9102 (Actions run 42308372590).
+
 - Set the supplied 512×512 PNG as the app and round launcher icon.
 
 - Created permanent RSA-3072/PKCS12 signing identity without committing private material, then securely migrated it into the dedicated PVE CT 9102 (`android-keystore`) and uploaded all four GitHub Actions `SIGNING_*` secrets using its authenticated GitHub CLI. Added a pinned certificate verification script, permanent signing for debug/APK and Google Play AAB, a manual signed AAB release workflow, and kept the legacy fixed-test-key debug fallback pending repository-secret configuration. See `keystore/README.md` for one-time APK signer migration.
