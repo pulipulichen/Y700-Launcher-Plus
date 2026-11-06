@@ -203,14 +203,6 @@ private fun LauncherScreen() {
                     }
                 }
             }
-
-            Text(
-                text = stringResource(R.string.taskbar_hint),
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }

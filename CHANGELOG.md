@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- GitHub Actions now signs sideload APKs with a fixed temporary test keystore and verifies the APK signature before publishing to `launcher-latest`.
+- Removed the unconditional taskbar hint. On the test Y700, the native ZUI Taskbar was hidden with `open_taskbar=0`. Restoring the original `zui_taskbar_feature_enable=0` and setting `open_taskbar=1` restored the ZUI window and its touchable region while Launcher Plus remained the default HOME.
+
 - Replaced the Phase 0 placeholder screen with the first personal-use launcher shell: searchable app grid, direct app launch, and locally persisted pinned apps.
 - Added Traditional Chinese strings and the minimum Android package-visibility query needed to list launchable apps.
 - Confirmed custom HOME content and the native ZUI taskbar are visible together in the supplied TB320FC screenshot.

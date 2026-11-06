@@ -48,14 +48,25 @@ jobs:
           gradle-version: '8.13'
           cache-provider: basic
 
-      - name: Compile and lint
-        run: gradle --no-daemon --console=plain :app:assembleDebug :app:lintDebug
+      - name: Compile and lint with fixed test signing
+        env:
+          Y700_TEST_KEYSTORE_BASE64: ${{ secrets.Y700_TEST_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          : "${Y700_TEST_KEYSTORE_BASE64:?Set the fixed Y700 test keystore secret}"
+          umask 077
+          export Y700_TEST_KEYSTORE_PATH="$(mktemp "$RUNNER_TEMP/y700-test.XXXXXXXX.p12")"
+          trap 'rm -f "$Y700_TEST_KEYSTORE_PATH"' EXIT
+          printf '%s' "$Y700_TEST_KEYSTORE_BASE64" | base64 --decode > "$Y700_TEST_KEYSTORE_PATH"
+          unset Y700_TEST_KEYSTORE_BASE64
+          gradle --no-daemon --console=plain :app:assembleDebug :app:lintDebug
 
       - name: Prepare release assets
         shell: bash
         run: |
           apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-debug.apk"
           test -s app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk
           cp app/build/outputs/apk/debug/app-debug.apk "$apk_path"
           sha256sum "$apk_path" > "$apk_path.sha256"
 

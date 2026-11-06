@@ -11,5 +11,4 @@
     <string name="no_pinned_apps">尚未釘選應用程式</string>
     <string name="add_to_home">加入桌面</string>
     <string name="remove_from_home">移除</string>
-    <string name="taskbar_hint">原有的 ZUI 工具列會留在畫面底部</string>
 </resources>

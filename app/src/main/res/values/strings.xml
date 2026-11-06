@@ -11,5 +11,4 @@
     <string name="no_pinned_apps">No apps pinned yet</string>
     <string name="add_to_home">Add to home</string>
     <string name="remove_from_home">Remove</string>
-    <string name="taskbar_hint">Your original ZUI taskbar stays available below</string>
 </resources>
