@@ -12,14 +12,17 @@ internal data class LauncherLayout(
     val showLabels: Boolean = true
 ) {
     fun save(preferences: SharedPreferences) {
-        val data = JSONObject()
+        preferences.edit().putString("layout_v1", toJson()).apply()
+    }
+
+    fun toJson(): String = JSONObject()
+            .put("version", 1)
             .put("pages", JSONArray(pages.map { JSONArray(it) }))
             .put("dock", JSONArray(dock))
             .put("hidden", JSONArray(hidden))
             .put("columns", columns)
             .put("showLabels", showLabels)
-        preferences.edit().putString("layout_v1", data.toString()).apply()
-    }
+            .toString()
 
     companion object {
         const val MAX_PAGES = 12
@@ -27,17 +30,7 @@ internal data class LauncherLayout(
 
         fun load(preferences: SharedPreferences, apps: List<LauncherApp>): LauncherLayout {
             val saved = preferences.getString("layout_v1", null)
-            if (saved != null) {
-                val data = JSONObject(saved)
-                val pages = data.getJSONArray("pages")
-                return LauncherLayout(
-                    pages = List(pages.length()) { pages.getJSONArray(it).packages() },
-                    dock = data.getJSONArray("dock").packages(),
-                    hidden = data.getJSONArray("hidden").packages().toSet(),
-                    columns = data.getInt("columns"),
-                    showLabels = data.getBoolean("showLabels")
-                )
-            }
+            if (saved != null) return fromJson(saved)
             val oldPins = preferences.getStringSet("pinned_packages", null)
             val pins = if (oldPins == null) {
                 apps.take(8).map { it.packageName }
@@ -49,6 +42,25 @@ internal data class LauncherLayout(
             return LauncherLayout(pages = listOf(pins)).also { it.save(preferences) }
         }
 
-        private fun JSONArray.packages(): List<String> = List(length(), ::getString)
+        fun fromJson(json: String): LauncherLayout {
+            val data = JSONObject(json)
+            require(!data.has("version") || data.getInt("version") == 1)
+            val pages = data.getJSONArray("pages")
+            require(pages.length() in 1..MAX_PAGES)
+            val dock = data.getJSONArray("dock")
+            require(dock.length() <= MAX_DOCK_APPS)
+            val columns = data.getInt("columns")
+            require(columns == 0 || columns in 4..8)
+            return LauncherLayout(
+                pages = List(pages.length()) { pages.getJSONArray(it).packages() },
+                dock = dock.packages(),
+                hidden = data.getJSONArray("hidden").packages().toSet(),
+                columns = columns,
+                showLabels = data.getBoolean("showLabels")
+            )
+        }
+
+        private fun JSONArray.packages(): List<String> =
+            List(length(), ::getString).onEach { require(it.isNotBlank() && it.length <= 255) }.distinct()
     }
 }

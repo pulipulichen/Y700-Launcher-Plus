@@ -27,4 +27,11 @@
     <string name="page_counter">第 %1$d 頁，共 %2$d 頁</string>
     <string name="move_next_page">移至下一頁</string>
     <string name="move_previous_page">移至上一頁</string>
+    <string name="backup_saved">已儲存版面備份</string>
+    <string name="backup_failed">無法儲存版面備份</string>
+    <string name="restore_failed">無法讀取相容的版面備份</string>
+    <string name="export_backup">匯出版面備份</string>
+    <string name="import_backup">匯入版面備份</string>
+    <string name="confirm_restore">要以備份取代目前的桌面分頁、常駐列、隱藏清單和格線設定嗎？</string>
+    <string name="restore">還原</string>
 </resources>

@@ -27,4 +27,11 @@
     <string name="page_counter">%1$d of %2$d</string>
     <string name="move_next_page">Move to next page</string>
     <string name="move_previous_page">Move to previous page</string>
+    <string name="backup_saved">Layout backup saved</string>
+    <string name="backup_failed">Could not save the backup</string>
+    <string name="restore_failed">Could not read a compatible layout backup</string>
+    <string name="export_backup">Export layout backup</string>
+    <string name="import_backup">Import layout backup</string>
+    <string name="confirm_restore">Replace the current pages, dock, hidden apps and grid settings with this backup?</string>
+    <string name="restore">Restore</string>
 </resources>

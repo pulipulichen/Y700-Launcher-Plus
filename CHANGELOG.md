@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added versioned layout export and confirmed restore using Android document providers in the same launcher APK.
+
 - 0.2.0 separates home pages, app drawer and launcher dock, adds home grid settings and hidden apps, and migrates existing pins. CI uses the existing fixed signing workflow and publishes to `launcher-latest`. See `docs/NOVA-PARITY.md` for remaining feature and Y700 acceptance checks.
 - Actions run 42236542284 (commit 8b6c219) failed in Compile and lint with fixed test signing at `:app:mergeExtDexDebug` with `OutOfMemoryError: Java heap space`. Set the Gradle heap to 2 GiB and rebuilt.
 

@@ -2,7 +2,7 @@ plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id(
 android {
  namespace = "info.pulipuli.y700launcherplus"
  compileSdk = 36
- defaultConfig { applicationId = "info.pulipuli.y700launcherplus"; minSdk = 29; targetSdk = 35; versionCode = 2; versionName = "0.2.0" }
+ defaultConfig { applicationId = "info.pulipuli.y700launcherplus"; minSdk = 29; targetSdk = 35; versionCode = 3; versionName = "0.2.1" }
  // GitHub Actions supplies a stable, temporary key for sideloaded debug builds.
  val testKeystore = providers.environmentVariable("Y700_TEST_KEYSTORE_PATH")
  signingConfigs.getByName("debug") {

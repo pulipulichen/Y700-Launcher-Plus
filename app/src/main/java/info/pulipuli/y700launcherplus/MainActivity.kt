@@ -291,6 +291,10 @@ private fun LauncherScreen(catalogRevision: Int, homeRevision: Int) {
                             panel = Panel.HOME
                             pager.requestScrollToPage(nextPage)
                         },
+                        restore = { restored ->
+                            pager.requestScrollToPage(0)
+                            update(restored)
+                        },
                         removeLastPage = {
                             val lastPage = layout.pages.lastIndex
                             if (pager.currentPage == lastPage) pager.requestScrollToPage(lastPage - 1)
