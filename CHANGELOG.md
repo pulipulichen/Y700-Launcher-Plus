@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Set the supplied 512×512 PNG as the app and round launcher icon.
+
 - Created permanent RSA-3072/PKCS12 signing identity without committing private material, then securely migrated it into the dedicated PVE CT 9102 (`android-keystore`) and uploaded all four GitHub Actions `SIGNING_*` secrets using its authenticated GitHub CLI. Added a pinned certificate verification script, permanent signing for debug/APK and Google Play AAB, a manual signed AAB release workflow, and kept the legacy fixed-test-key debug fallback pending repository-secret configuration. See `keystore/README.md` for one-time APK signer migration.
 
 - Added versioned layout export and confirmed restore using Android document providers in the same launcher APK.
