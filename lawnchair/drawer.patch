@@ -126,7 +126,7 @@ index ff8ea35..19e2f2e 100644
          ),
      )
 diff --git a/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt b/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
-index aa44969..2cca832 100644
+index aa44969..7202247 100644
 --- a/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
 +++ b/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
 @@ -122,7 +122,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
@@ -138,15 +138,58 @@ index aa44969..2cca832 100644
  
          val searchProvider = getSearchProvider(context, prefs2)
          val isGoogle = searchProvider == Google || searchProvider == GoogleGo || searchProvider == PixelSearch
-@@ -223,6 +223,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+@@ -139,7 +139,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+             isVisible = false
+             setOnClickListener {
+                 input.reset()
+-                searchAlgorithm?.doZeroStateSearch(this@AllAppsSearchInput)
++                showAllAppsOnEmptyQuery()
+                 updateHint()
+             }
+         }
+@@ -192,7 +192,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+                 }
+ 
+                 if (input.text.toString().isEmpty()) {
+-                    searchAlgorithm?.doZeroStateSearch(this)
++                    showAllAppsOnEmptyQuery()
+                 }
+ 
+                 setBackgroundVisibility(false, 0f)
+@@ -223,8 +223,9 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
              },
              afterTextChanged = {
                  updateHint()
 +                if (::appsView.isInitialized) appsView.requestLayout()
                  if (input.text.isNullOrEmpty()) {
-                     searchAlgorithm?.doZeroStateSearch(this)
+-                    searchAlgorithm?.doZeroStateSearch(this)
++                    showAllAppsOnEmptyQuery()
                  }
-@@ -412,7 +413,9 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+                 if (input.text.toString() == "/lawnchairdebug") {
+                     val enableDebugMenu = prefs.enableDebugMenu
+@@ -375,6 +376,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+     }
+ 
+     override fun onSearchResult(query: String, items: ArrayList<AdapterItem>?) {
++        if (query != input.text.toString()) return
+         if (items != null) {
+             apps.setSearchResults(items)
+             notifyResultChanged()
+@@ -382,6 +384,13 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+         }
+     }
+ 
++    private fun showAllAppsOnEmptyQuery() {
++        if (!::appsView.isInitialized) return
++        searchAlgorithm?.cancel(true)
++        clearSearchResult()
++        appsView.requestLayout()
++    }
++
+     override fun clearSearchResult() {
+         if (apps.setSearchResults(null)) {
+             notifyResultChanged()
+@@ -412,7 +421,9 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
  
      override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
          super.onLayout(changed, l, t, r, b)
@@ -481,7 +524,7 @@ index 0000000..cabf5a5
 +}
 diff --git a/lawnchair/src/app/lawnchair/y700/DrawerPreferences.kt b/lawnchair/src/app/lawnchair/y700/DrawerPreferences.kt
 new file mode 100644
-index 0000000..74067e4
+index 0000000..44cd1b9
 --- /dev/null
 +++ b/lawnchair/src/app/lawnchair/y700/DrawerPreferences.kt
 @@ -0,0 +1,68 @@
@@ -523,7 +566,7 @@ index 0000000..74067e4
 +
 +private fun installed(context: android.content.Context): List<android.content.pm.LauncherActivityInfo> =
 +    context.getSystemService(android.content.pm.LauncherApps::class.java)
-+        .getActivityList(null, android.os.Process.myUserHandle()).sortedBy { it.label.toString() }
++        ?.getActivityList(null, android.os.Process.myUserHandle()).orEmpty().sortedBy { it.label.toString() }
 +
 +private fun app(info: android.content.pm.LauncherActivityInfo) = com.android.launcher3.model.data.AppInfo().apply {
 +    componentName = info.componentName

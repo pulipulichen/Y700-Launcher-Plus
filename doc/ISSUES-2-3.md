@@ -16,7 +16,7 @@ Updated: 2026-11-07. Implementation is an incremental `lawnchair/drawer.patch` a
 
 ## Issue 2 observed boundary
 
-Device: Lenovo TB320FC, Android 15. Previously recorded ZUI version: 17.0.350. The currently installed preview was `15.0.0-beta3-y700`, version code 29900275. At investigation time the selected HOME was `com.zui.launcher/.drawer.NormalLauncher`.
+Device: Lenovo TB320FC, Android 15. Previously recorded ZUI version: 17.0.350. The currently installed preview was `15.0.0-beta3-y700`, version code 29900275. Firmware build ID observed on device: `TB320FC_CN_OPEN_USER_Q00031.0_V_ZUXOS_1.1.350_ST_250418`. At investigation time the selected HOME was `com.zui.launcher/.drawer.NormalLauncher`.
 
 Read-only ADB evidence:
 
@@ -33,5 +33,6 @@ No root, signature-permission grant, private database editing, proprietary API o
 ## Validation state
 
 - Patch/resource review performed; compile, signature, host ranking tests and Release results are recorded in CHANGELOG.md when available.
-- The ADB connection initially worked, then disappeared; connection to the original port 35595 was refused and mDNS returned no service. The subsequent planned HOME / Settings / file-manager test did not execute any successful ADB action. Default HOME was therefore not changed by that attempt.
+- ADB temporarily disconnected, then reconnected at port 34353. With the installed baseline preview selected as HOME, the ZUI-owned Taskbar reported `isOnScreen=true`, `isVisible=true` and `mHasSurface=true` on HOME, system Settings and Calculator. The file-manager implicit launch failed to resolve, so Calculator was used for the second app. Restored `com.zui.launcher/.drawer.NormalLauncher` as default HOME after each test. These are window-manager checks on the baseline APK, not visual acceptance of the new drawer.
+- All 11 pure Java ranking/responsive-width checks passed in Actions run 42336382337 and locally through the installed JDK compiler module. That run then failed Kotlin compilation on nullable `LauncherApps`; null-safe service lookup with an empty-list fallback corrects it. The build of that correction is tracked in CHANGELOG.md.
 - Device acceptance must still cover all four position combinations, portrait/landscape, IME and back behavior, native long-press actions, search aliases/Chinese, launch reset, and persistence after restart. Do not mark Issue 3 fully accepted until these pass.
