@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 2026-11-07: Actions run [42326549446](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42326549446) passed packaging, package ID and permanent signer verification and published the [signed preview](https://github.com/pulipulichen/Y700-Launcher-Plus/releases/tag/lawnchair15-preview-42326549446-1). Verified the SHA-256 before installing over the prior APK on TB320FC. Confirmed cold start, default HOME, ZUI-owned Taskbar visibility, ZUI Recents, and return from Settings. Legacy preferences were backed up. Full device acceptance and migration remain pending.
+
 - 2026-11-07: Actions run [42325661068](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42325661068) failed during `lintVitalLawnWithQuickstepPlayRelease` with 1,527 upstream resource errors across `ResAuto`, `MissingDefaultResource` and `ExtraTranslation`. Restore the upstream release packaging setting and run lint separately as an advisory check after the preview APK passes package, signature and checksum verification.
 
 - 2026-11-07: Actions run [42323763050](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323763050) spent more than 18 minutes in the combined release assembly and debug lint step without publishing an APK. Build and lint the same release variant in separate bounded steps. The preview skips code and resource shrinking. Superseded preview runs are cancelled.

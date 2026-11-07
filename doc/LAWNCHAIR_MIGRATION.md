@@ -28,13 +28,20 @@ The preview includes upstream Launcher3/Lawnchair workspace and settings. The Y7
 7. On Y700: connect Wireless ADB, record launcher package and current HOME, install APK, verify signature and startup, test dock/widgets and revert HOME on failure.
 
 ## Current gates
+
 - [x] Existing project backed up to branch.
 - [x] Apache-2.0 upstream root license identified.
 - [ ] All transitive licenses and trademarks audited.
 - [x] Complete upstream checkout and SystemUI pins verified.
-- [ ] Build, lint and APK identity checks passed.
-- [ ] Signed release APK produced.
-- [ ] Device test passed.
+- [x] Build, package and certificate checks passed.
+- [x] Signed preview APK published and installed over the previous build without clearing data.
+- [x] Device smoke test passed on TB320FC / Android 15 / ZUI 17.0.350.
+- [ ] Full device acceptance, legacy layout migration, and cloud backup.
 
-## Operational blocker
-Y700 MCP device_info returned: `Tunnel-client has not been seen for 300 seconds`. Reconnect the Y700 tunnel before deployment; do not claim device testing until connected.
+## Device smoke test
+
+[Actions run 42326549446](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42326549446) built and published the [signed preview](https://github.com/pulipulichen/Y700-Launcher-Plus/releases/tag/lawnchair15-preview-42326549446-1) from commit `2e47b69198e2f6d2340bd0436d56bc9e58e0236e`. Lint is a separate advisory check for this preview because the pinned upstream has known lint errors.
+
+Verified the downloaded APK's SHA-256 and upgraded `info.pulipuli.y700launcherplus` with ADB. Version `15.0.0-beta3-y700`, code `29900275`, cold-started and was selected as the default HOME. The native Taskbar window was owned by `com.zui.launcher` and reported on screen and visible. Settings opened in the foreground, the system recent-apps key opened ZUI Recents, and the HOME key returned to Y700 Launcher Plus with the native Taskbar visible.
+
+The previous Y700 layout preferences were backed up before installation. The preview uses Lawnchair's own database. Manual taskbar touch targets, landscape, split screen, floating windows, reboot persistence and search behavior remain to be verified.
