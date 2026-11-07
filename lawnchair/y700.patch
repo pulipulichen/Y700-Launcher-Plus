@@ -1,3 +1,16 @@
+diff --git a/AndroidManifest-common.xml b/AndroidManifest-common.xml
+index e8fa644..8b0009d 100644
+--- a/AndroidManifest-common.xml
++++ b/AndroidManifest-common.xml
+@@ -76,7 +76,7 @@
+         android:backupInForeground="true"
+         android:fullBackupContent="@xml/backupscheme"
+         android:hardwareAccelerated="true"
+-        android:icon="@drawable/ic_launcher_home"
++        android:icon="@drawable/y700_launcher_icon"
+         android:label="@string/derived_app_name"
+         android:largeHeap="@bool/config_largeHeap"
+         android:restoreAnyVersion="true"
 diff --git a/build.gradle b/build.gradle
 index fc3ef62..8c9cf4c 100644
 --- a/build.gradle
@@ -64,6 +77,19 @@ index 4a8446c..a604eca 100644
          android:label="@string/derived_app_name"
          android:theme="@style/AppTheme"
          android:largeHeap="@bool/config_largeHeap"
+diff --git a/quickstep/AndroidManifest.xml b/quickstep/AndroidManifest.xml
+index e0aae7b..7195828 100644
+--- a/quickstep/AndroidManifest.xml
++++ b/quickstep/AndroidManifest.xml
+@@ -57,7 +57,7 @@
+          android:fullBackupOnly="true"
+          android:fullBackupContent="@xml/backupscheme"
+          android:hardwareAccelerated="true"
+-         android:icon="@drawable/ic_launcher_home"
++         android:icon="@drawable/y700_launcher_icon"
+          android:label="@string/derived_app_name"
+          android:theme="@style/AppTheme"
+          android:largeHeap="@bool/config_largeHeap"
 diff --git a/settings.gradle b/settings.gradle
 index 9afafdd..235c015 100644
 --- a/settings.gradle

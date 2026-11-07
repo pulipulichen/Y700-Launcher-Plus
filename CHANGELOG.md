@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 2026-11-07: Actions run [42323346868](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323346868) reached Android manifest merging and failed because the Y700 icon conflicted with the upstream Quickstep icon. Use the same Y700 drawable in all three app manifests.
+
 - 2026-11-07: Added Traditional/Simplified Chinese aliases, accent-insensitive pinyin and pinyin initials to both Lawnchair app search paths. Matching uses Android ICU and its default readings for characters with multiple pronunciations. Hidden-app search rules still apply. Android compile and device search acceptance are pending.
 
 - 2026-11-07: Integrated a pinned Lawnchair 15 Beta 3 preview build with the existing Y700 package ID, icon and permanent certificate. The preview has a separate Release tag and starts with a fresh Lawnchair layout. Confirmed upstream and SystemUI pins. Local Gradle 9.3.0 wrapper download failed with `Network is unreachable`. Actions run [42323139795](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323139795) verified the source, SDK and permanent certificate, then stopped because the upstream root project has no `testLawnWithQuickstepPlayReleaseUnitTest` task. Use the supported assemble and lint tasks. Wireless ADB discovery returned no device. Compilation, legacy data migration and Y700 device acceptance are pending.
