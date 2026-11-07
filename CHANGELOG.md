@@ -49,3 +49,5 @@
 - Installed APK on Y700 TB320FC; SHA-256 matched `fa6f849982bef6cac759a94dd1d33788d653e6767b98b147f8943d1aa67d9989`. Android accepted `info.pulipuli.y700launcherplus/.MainActivity` as the default HOME and launched the activity.
 - Earlier window-manager checks reported the ZUI Taskbar window visible while the custom HOME Activity was focused. The supplied screenshot now confirms visual coexistence: custom launcher content is visible above the original ZUI taskbar.
 - Still to verify on the device: launch from another app, landscape, split screen, floating windows, and behavior after reboot. Raw device logs were not published.
+
+- 2026-11-07: Refine Issue #3 automatic grid sizing per active device profile for orientation changes; hide the manual column selector while automatic sizing is enabled. Add 11 host-only Java ranking/width regression checks to the preview workflow. Local Java runtime lacks javac, so execute these checks with Actions JDK 21. Record actual local-history privacy behavior and Taskbar evidence in doc/ISSUES-2-3.md. Device connection dropped before additional HOME/app checks; original ADB port refused reconnection.

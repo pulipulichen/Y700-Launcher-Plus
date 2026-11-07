@@ -35,6 +35,15 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: Check drawer ranking and responsive layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/drawer-tests"
+          javac -d "$RUNNER_TEMP/drawer-tests" \
+            "$RUNNER_TEMP/y700-lawnchair/lawnchair/src/app/lawnchair/y700/DrawerRank.java" \
+            lawnchair/tests/DrawerRankTest.java
+          java -cp "$RUNNER_TEMP/drawer-tests" DrawerRankTest
       - name: Set up Android SDK 36.1
         uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
         with:

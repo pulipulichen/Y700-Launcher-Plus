@@ -6,6 +6,8 @@ A personal, non-root Android HOME launcher for Lenovo Legion Y700 tablets. The f
 
 The preview builds from [Lawnchair 15 Beta 3](https://github.com/LawnchairLauncher/lawnchair/releases/tag/v15.0.0-beta3.0) with the Y700 app identity and permanent signing certificate. See the [migration status and upgrade checks](doc/LAWNCHAIR_MIGRATION.md).
 
+The drawer update adds independently positioned search and frequent-app rows, local recent/frequency ranking, pin/exclusion management, search aliases and an adaptive grid. See [implementation and acceptance status](doc/ISSUES-2-3.md). Native ZUI Taskbar editing remains in ZUI; the new settings entry opens that HOME without changing the default launcher.
+
 ## Current legacy build
 
 - Separate home pages, searchable app drawer, and an optional set of pinned dock shortcuts.

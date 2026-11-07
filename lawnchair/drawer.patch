@@ -126,7 +126,7 @@ index ff8ea35..19e2f2e 100644
          ),
      )
 diff --git a/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt b/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
-index aa44969..1376b67 100644
+index aa44969..2cca832 100644
 --- a/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
 +++ b/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
 @@ -122,7 +122,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
@@ -146,8 +146,19 @@ index aa44969..1376b67 100644
                  if (input.text.isNullOrEmpty()) {
                      searchAlgorithm?.doZeroStateSearch(this)
                  }
+@@ -412,7 +413,9 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+ 
+     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+         super.onLayout(changed, l, t, r, b)
+-        offsetTopAndBottom(allAppsSearchVerticalOffset)
++        if (parent !is app.lawnchair.allapps.views.SearchContainerView) {
++            offsetTopAndBottom(allAppsSearchVerticalOffset)
++        }
+     }
+ 
+     override fun getEditText() = input
 diff --git a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
-index eced8b1..36f59c0 100644
+index eced8b1..8077aea 100644
 --- a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
 +++ b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
 @@ -2,10 +2,116 @@ package app.lawnchair.allapps.views
@@ -207,7 +218,7 @@ index eced8b1..36f59c0 100644
 +    private val updateListener = com.android.launcher3.allapps.AllAppsStore.OnUpdateListener { refreshFrequent() }
 +    fun refreshFrequent() {
 +        val row = frequent ?: return
-+        val columns = ((width / resources.displayMetrics.density) / 80).toInt().coerceIn(1, 12)
++        val columns = app.lawnchair.y700.DrawerRank.columns(width / resources.displayMetrics.density, 1)
 +        lastColumns = columns
 +        row.removeAllViews()
 +        val hidden = prefs.hiddenApps.firstBlocking()
@@ -230,7 +241,7 @@ index eced8b1..36f59c0 100644
 +    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
 +        super.onLayout(changed, l, t, r, b)
 +        val row = frequent ?: return
-+        val columns = ((width / resources.displayMetrics.density) / 80).toInt().coerceIn(1, 12)
++        val columns = app.lawnchair.y700.DrawerRank.columns(width / resources.displayMetrics.density, 1)
 +        if (columns != lastColumns) post { refreshFrequent() }
 +        val insets = rootWindowInsets?.let { WindowInsetsCompat.toWindowInsetsCompat(it) }
 +        val bars = insets?.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -382,7 +393,7 @@ index 0766225..9da96be 100644
          return appResults.map { SearchResult.App(data = it) }
      }
 diff --git a/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt b/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt
-index eb03df4..af1c495 100644
+index eb03df4..3e1d260 100644
 --- a/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt
 +++ b/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt
 @@ -73,6 +73,7 @@ fun AppDrawerPreferences(
@@ -402,19 +413,39 @@ index eb03df4..af1c495 100644
          }
          PreferenceGroup(heading = stringResource(R.string.style)) {
              ColorPreference(preference = prefs2.appDrawerBackgroundColor)
+@@ -103,12 +104,14 @@ fun AppDrawerPreferences(
+             )
+         }
+         PreferenceGroup(heading = stringResource(id = R.string.grid)) {
+-            SliderPreference(
+-                label = stringResource(id = R.string.app_drawer_columns),
+-                adapter = prefs2.drawerColumns.getAdapter(),
+-                step = 1,
+-                valueRange = 3..10,
+-            )
++            ExpandAndShrink(visible = !prefs2.drawerAutomaticColumns.getAdapter().state.value) {
++                SliderPreference(
++                    label = stringResource(id = R.string.app_drawer_columns),
++                    adapter = prefs2.drawerColumns.getAdapter(),
++                    step = 1,
++                    valueRange = 3..10,
++                )
++            }
+             SliderPreference(
+                 adapter = prefs2.drawerCellHeightFactor.getAdapter(),
+                 label = stringResource(id = R.string.row_height_label),
 diff --git a/lawnchair/src/app/lawnchair/y700/DrawerHistory.kt b/lawnchair/src/app/lawnchair/y700/DrawerHistory.kt
 new file mode 100644
-index 0000000..764add8
+index 0000000..cabf5a5
 --- /dev/null
 +++ b/lawnchair/src/app/lawnchair/y700/DrawerHistory.kt
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,39 @@
 +package app.lawnchair.y700
 +
 +import android.content.Context
 +import com.android.launcher3.model.data.AppInfo
 +import com.android.launcher3.model.data.ItemInfo
 +import java.util.Locale
-+import kotlin.math.ln
 +
 +/** Launcher-originated launches only. No Usage Access, network or cloud dependency. */
 +class DrawerHistory(context: Context) {
@@ -438,8 +469,7 @@ index 0000000..764add8
 +    fun clear(kind: String) { prefs.edit().remove(kind).apply() }
 +    fun score(item: ItemInfo, now: Long = System.currentTimeMillis()): Double {
 +        val last = prefs.getLong("last:${key(item)}", 0)
-+        val ageDays = ((now - last).coerceAtLeast(0)).toDouble() / 86400000.0
-+        return ln(1.0 + count(item)) + if (last > 0) 4.0 / (1.0 + ageDays) else 0.0
++        return DrawerRank.score(count(item), last, now)
 +    }
 +    fun recommendations(apps: List<AppInfo>, hidden: Set<String>, limit: Int): List<AppInfo> {
 +        val available = apps.filter { it.toComponentKey().toString() !in hidden && !contains("excluded", it) }
@@ -523,6 +553,25 @@ index 0000000..74067e4
 +                .setNegativeButton(android.R.string.cancel, null).show()
 +        }.show()
 +}
+diff --git a/lawnchair/src/app/lawnchair/y700/DrawerRank.java b/lawnchair/src/app/lawnchair/y700/DrawerRank.java
+new file mode 100644
+index 0000000..a334ca7
+--- /dev/null
++++ b/lawnchair/src/app/lawnchair/y700/DrawerRank.java
+@@ -0,0 +1,13 @@
++package app.lawnchair.y700;
++
++/** Pure ranking/layout policy shared with the host-side regression checks. */
++public final class DrawerRank {
++    private DrawerRank() {}
++    public static double score(int count, long last, long now) {
++        double ageDays = Math.max(0.0, ((double) now - last)) / 86400000.0;
++        return Math.log1p(Math.max(0, count)) + (last > 0 ? 4.0 / (1.0 + ageDays) : 0.0);
++    }
++    public static int columns(float widthDp, int minimum) {
++        return Math.max(minimum, Math.min(12, (int) (widthDp / 80)));
++    }
++}
 diff --git a/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt b/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt
 new file mode 100644
 index 0000000..a179ba9
@@ -569,6 +618,21 @@ index 0000000..a179ba9
 +            .setNegativeButton(android.R.string.cancel, null).show()
 +    }
 +}
+diff --git a/src/com/android/launcher3/DeviceProfile.java b/src/com/android/launcher3/DeviceProfile.java
+index 26f657b..f5532f8 100644
+--- a/src/com/android/launcher3/DeviceProfile.java
++++ b/src/com/android/launcher3/DeviceProfile.java
+@@ -590,7 +590,9 @@ public class DeviceProfile {
+         numShownHotseatIcons = isTwoPanels ? inv.numDatabaseHotseatIcons : inv.numShownHotseatIcons;
+         mHotseatColumnSpan = inv.numColumns;
+ 
+-        numShownAllAppsColumns = isTwoPanels ? inv.numDatabaseAllAppsColumns : inv.numAllAppsColumns;
++        numShownAllAppsColumns = PreferenceExtensionsKt.firstBlocking(preferenceManager2.getDrawerAutomaticColumns())
++                ? app.lawnchair.y700.DrawerRank.columns(availableWidthPx / mMetrics.density, 3)
++                : (isTwoPanels ? inv.numDatabaseAllAppsColumns : inv.numAllAppsColumns);
+ 
+         int hotseatBarBottomSpace = !isQsbEnable ? 0 : pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics);
+         int minQsbMargin = res.getDimensionPixelSize(R.dimen.min_qsb_margin);
 diff --git a/src/com/android/launcher3/Launcher.java b/src/com/android/launcher3/Launcher.java
 index 0cad4ec..f37ca05 100644
 --- a/src/com/android/launcher3/Launcher.java
