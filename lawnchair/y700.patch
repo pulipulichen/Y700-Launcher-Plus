@@ -12,7 +12,7 @@ index e8fa644..8b0009d 100644
          android:largeHeap="@bool/config_largeHeap"
          android:restoreAnyVersion="true"
 diff --git a/build.gradle b/build.gradle
-index fc3ef62..d528433 100644
+index fc3ef62..391c763 100644
 --- a/build.gradle
 +++ b/build.gradle
 @@ -37,7 +37,7 @@ allprojects {
@@ -20,7 +20,7 @@ index fc3ef62..d528433 100644
              lint {
                  abortOnError true
 -                checkReleaseBuilds false
-+                checkReleaseBuilds providers.gradleProperty("y700Preview").isPresent()
++                checkReleaseBuilds(providers.gradleProperty("y700Preview").isPresent())
              }
              compileOptions {
                  sourceCompatibility = libs.versions.jdkRelease.get()
@@ -62,8 +62,8 @@ index fc3ef62..d528433 100644
 -            minifyEnabled true
 -            shrinkResources true
 +            resValue("string", "derived_app_name", "Y700 Launcher Plus")
-+            minifyEnabled !providers.gradleProperty("y700Preview").isPresent()
-+            shrinkResources !providers.gradleProperty("y700Preview").isPresent()
++            minifyEnabled(!providers.gradleProperty("y700Preview").isPresent())
++            shrinkResources(!providers.gradleProperty("y700Preview").isPresent())
              proguardFiles proguardFilesFromAosp + "proguard.pro"
          }
      }
