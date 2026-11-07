@@ -2,7 +2,11 @@
 
 A personal, non-root Android HOME launcher for Lenovo Legion Y700 tablets. The first device check confirms that the custom HOME screen can appear with the original ZUI taskbar visible on a TB320FC running Android 15 / ZUI 17.0.350.
 
-## Current build
+## Lawnchair 15 migration
+
+The preview builds from [Lawnchair 15 Beta 3](https://github.com/LawnchairLauncher/lawnchair/releases/tag/v15.0.0-beta3.0) with the Y700 app identity and permanent signing certificate. See the [migration status and upgrade checks](doc/LAWNCHAIR_MIGRATION.md).
+
+## Current legacy build
 
 - Separate home pages, searchable app drawer, and an optional set of pinned dock shortcuts.
 - Swipe between pages. Long-press icons to place, move, remove, or hide them.

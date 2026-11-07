@@ -1,0 +1,105 @@
+name: Y700 Lawnchair 15 preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/lawnchair-preview.yml"
+      - "lawnchair/**"
+      - "app/src/main/res/mipmap-nodpi/ic_launcher.png"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lawnchair-preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Prepare pinned Lawnchair source
+        run: ./lawnchair/prepare.sh "$RUNNER_TEMP/y700-lawnchair"
+      - name: Set up JDK 21
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Android SDK 36.1
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          accept-android-sdk-licenses: true
+          packages: 'platform-tools platforms;android-36.1 build-tools;36.1.0'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          cache-provider: basic
+      - name: Build and lint with fixed signing
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          cd "$RUNNER_TEMP/y700-lawnchair"
+          trap 'rm -f release.keystore keystore.properties' EXIT
+          if [[ -z "$SIGNING_KEYSTORE_BASE64" || -z "$SIGNING_STORE_PASSWORD" || -z "$SIGNING_KEY_PASSWORD" || -z "$SIGNING_KEY_ALIAS" ]]; then
+            echo "::error::All four SIGNING_* secrets are required."
+            exit 1
+          fi
+          printf '%s' "$SIGNING_KEYSTORE_BASE64" | base64 --decode > release.keystore
+          printf 'storeFile=release.keystore\nstorePassword=%s\nkeyPassword=%s\nkeyAlias=%s\n' \
+            "$SIGNING_STORE_PASSWORD" "$SIGNING_KEY_PASSWORD" "$SIGNING_KEY_ALIAS" > keystore.properties
+          fp="$(keytool -exportcert -rfc -keystore release.keystore -storepass "$SIGNING_STORE_PASSWORD" -alias "$SIGNING_KEY_ALIAS" 2>/dev/null | openssl x509 -noout -fingerprint -sha256 | cut -d= -f2)"
+          [[ "$fp" == '8F:4C:5A:D0:18:AA:5F:E5:32:C4:F1:FF:12:60:EF:08:02:82:48:9D:C6:D2:03:2A:5E:BD:62:AF:18:EE:54:B3' ]] || { echo "::error::Permanent key fingerprint mismatch."; exit 1; }
+          echo "Using verified permanent signing certificate."
+          version_code=$(( $(date -u +%s) / 60 ))
+          ./gradlew --no-daemon --console=plain -PappVersionCode="$version_code" -PrequirePermanentSigning \
+            testLawnWithQuickstepPlayReleaseUnitTest assembleLawnWithQuickstepPlayRelease lintLawnWithQuickstepPlayDebug
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk_path="$RUNNER_TEMP/Y700-Launcher-Plus-Lawnchair15.apk"
+          cd "$RUNNER_TEMP/y700-lawnchair"
+          shopt -s nullglob
+          apks=(build/outputs/apk/lawnWithQuickstepPlay/release/*.apk)
+          [[ ${#apks[@]} == 1 ]]
+          test -s "${apks[0]}"
+          tools="$ANDROID_HOME/build-tools/36.1.0"
+          "$tools/aapt" dump badging "${apks[0]}" > "$RUNNER_TEMP/y700-badging.txt"
+          grep -q "^package: name='info.pulipuli.y700launcherplus' " "$RUNNER_TEMP/y700-badging.txt"
+          certs=$("$tools/apksigner" verify --print-certs "${apks[0]}")
+          printf '%s\n' "$certs"
+          digest=$(printf '%s\n' "$certs" | sed -n 's/^Signer #[0-9]* certificate SHA-256 digest: //p')
+          if [[ "$digest" != '8f4c5ad018aa5fe532c4f1ff1260ef080282489dc6d2032a5ebd62af18ee54b3' ]]; then
+            echo "::error::Built APK does not have the expected permanent signing certificate."
+            exit 1
+          fi
+          cp "${apks[0]}" "$apk_path"
+          (cd "$RUNNER_TEMP" && sha256sum Y700-Launcher-Plus-Lawnchair15.apk > Y700-Launcher-Plus-Lawnchair15.apk.sha256)
+      - name: Publish signed preview
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="lawnchair15-preview-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          apk="$RUNNER_TEMP/Y700-Launcher-Plus-Lawnchair15.apk"
+          gh release create "$tag" "$apk" "$apk.sha256" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --title "Y700 Launcher Plus – Lawnchair 15 preview" \
+            --notes "Signed preview from $GITHUB_SHA. Export your old layout before installing. The preview starts with a fresh Lawnchair layout. Y700 device acceptance is pending." \
+            --prerelease --latest=false

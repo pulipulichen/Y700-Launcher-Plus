@@ -1,0 +1,94 @@
+diff --git a/build.gradle b/build.gradle
+index fc3ef62..8c9cf4c 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -157,8 +157,8 @@ android {
+     defaultConfig {
+         // Lawnchair Launcher 15.0 Beta 3
+         // See CONTRIBUTING.md#versioning-scheme
+-        versionCode 15_00_02_03_00
+-        versionName "${versionDisplayName}"
++        versionCode providers.gradleProperty("appVersionCode").map { it.toInteger() }.getOrElse(3)
++        versionName "15.0.0-beta3-y700"
+         buildConfigField "String", "VERSION_DISPLAY_NAME", "\"${versionDisplayName}\""
+         buildConfigField "String", "MAJOR_VERSION", "\"${majorVersion}\""
+         buildConfigField "String", "COMMIT_HASH", "\"${buildCommit}\""
+@@ -221,8 +221,12 @@ android {
+             keyPassword keystoreProperties['keyPassword']
+             storeFile rootProject.file(keystoreProperties['storeFile'])
+             storePassword keystoreProperties['storePassword']
++            storeType "PKCS12"
++        }
++    } catch (FileNotFoundException missingKeystoreProperties) {
++        if (providers.gradleProperty("requirePermanentSigning").isPresent()) {
++            throw missingKeystoreProperties
+         }
+-    } catch (Exception ignored) {
+         releaseSigning = signingConfigs.debug
+     }
+
+@@ -244,11 +248,11 @@ android {
+
+         debug {
+             applicationIdSuffix ".debug"
+-            resValue("string", "derived_app_name", "Lawnchair (Debug)")
++            resValue("string", "derived_app_name", "Y700 Launcher Plus (Debug)")
+         }
+
+         release {
+-            resValue("string", "derived_app_name", "Lawnchair")
++            resValue("string", "derived_app_name", "Y700 Launcher Plus")
+             minifyEnabled true
+             shrinkResources true
+             proguardFiles proguardFilesFromAosp + "proguard.pro"
+@@ -288,7 +292,7 @@ android {
+         }
+
+         play {
+-            applicationId "app.lawnchair.play"
++            applicationId "info.pulipuli.y700launcherplus"
+             dimension "channel"
+             isDefault true
+         }
+diff --git a/quickstep/AndroidManifest-launcher.xml b/quickstep/AndroidManifest-launcher.xml
+index 4a8446c..a604eca 100644
+--- a/quickstep/AndroidManifest-launcher.xml
++++ b/quickstep/AndroidManifest-launcher.xml
+@@ -37,7 +37,8 @@
+         android:fullBackupOnly="true"
+         android:fullBackupContent="@xml/backupscheme"
+         android:hardwareAccelerated="true"
+-        android:icon="@drawable/ic_launcher_home"
++        android:icon="@drawable/y700_launcher_icon"
++        android:roundIcon="@drawable/y700_launcher_icon"
+         android:label="@string/derived_app_name"
+         android:theme="@style/AppTheme"
+         android:largeHeap="@bool/config_largeHeap"
+diff --git a/settings.gradle b/settings.gradle
+index 9afafdd..235c015 100644
+--- a/settings.gradle
++++ b/settings.gradle
+@@ -11,23 +11,6 @@ pluginManagement {
+     }
+ }
+
+-// https://docs.gradle.com/enterprise/gradle-plugin/
+-plugins {
+-    id "com.gradle.develocity" version "4.3.1"
+-}
+-
+-def isCI = providers.environmentVariable('CI').present
+-
+-develocity {
+-    buildScan {
+-        termsOfUseUrl = "https://gradle.com/terms-of-service"
+-        termsOfUseAgree = "yes"
+-        publishing {
+-            onlyIf { isCI }
+-        }
+-    }
+-}
+-
+ dependencyResolutionManagement {
+     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+     repositories {
