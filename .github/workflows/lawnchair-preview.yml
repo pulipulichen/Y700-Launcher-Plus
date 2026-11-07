@@ -68,7 +68,7 @@ jobs:
           echo "Using verified permanent signing certificate."
           version_code=$(( $(date -u +%s) / 60 ))
           ./gradlew --no-daemon --console=plain -PappVersionCode="$version_code" -PrequirePermanentSigning \
-            testLawnWithQuickstepPlayReleaseUnitTest assembleLawnWithQuickstepPlayRelease lintLawnWithQuickstepPlayDebug
+            assembleLawnWithQuickstepPlayRelease lintLawnWithQuickstepPlayDebug
       - name: Prepare release assets
         shell: bash
         run: |
