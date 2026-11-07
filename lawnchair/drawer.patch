@@ -1,0 +1,585 @@
+diff --git a/lawnchair/res/values-ja/y700_drawer.xml b/lawnchair/res/values-ja/y700_drawer.xml
+new file mode 100644
+index 0000000..9873db2
+--- /dev/null
++++ b/lawnchair/res/values-ja/y700_drawer.xml
+@@ -0,0 +1,18 @@
++<resources>
++    <string name="y700_layout">ドロワーの配置</string>
++    <string name="y700_search_bottom">検索欄を下に配置</string>
++    <string name="y700_frequent_bottom">よく使うアプリを下に配置</string>
++    <string name="y700_auto_grid">グリッド列数を自動調整</string>
++    <string name="y700_frequent">よく使うアプリ</string>
++    <string name="y700_show_frequent">よく使うアプリを表示</string>
++    <string name="y700_local_history">このランチャーからの起動頻度と最近の起動を使用します。履歴は端末内のみ。使用状況へのアクセスは不要です。</string>
++    <string name="y700_manage_pins">固定アプリを管理</string>
++    <string name="y700_manage_excluded">除外アプリを管理</string>
++    <string name="y700_alias">検索用の別名</string>
++    <string name="y700_alias_hint">アプリを選択して検索用の別名を編集。長押しでも別名、固定、除外、非表示を設定できます。</string>
++    <string name="y700_pin">固定／固定解除</string>
++    <string name="y700_exclude">おすすめから除外／復元</string>
++    <string name="y700_hide">アプリを非表示</string>
++    <string name="y700_taskbar">ZUI 標準タスクバー</string>
++    <string name="y700_taskbar_note">ZUI ホームを開いて標準バーを編集します。Android は他のランチャーからの直接編集を制限します。ホームで戻れます。既定のランチャーは変わりません。</string>
++</resources>
+diff --git a/lawnchair/res/values-zh-rCN/y700_drawer.xml b/lawnchair/res/values-zh-rCN/y700_drawer.xml
+new file mode 100644
+index 0000000..ebb1abf
+--- /dev/null
++++ b/lawnchair/res/values-zh-rCN/y700_drawer.xml
+@@ -0,0 +1,18 @@
++<resources>
++    <string name="y700_layout">抽屉布局</string>
++    <string name="y700_search_bottom">搜索框置于底部</string>
++    <string name="y700_frequent_bottom">常用应用栏置于底部</string>
++    <string name="y700_auto_grid">自动调整网格列数</string>
++    <string name="y700_frequent">最近常用应用</string>
++    <string name="y700_show_frequent">显示常用应用栏</string>
++    <string name="y700_local_history">仅依本启动器的最近启动及使用频率排序。记录保留在本机，无需使用情况访问权限。</string>
++    <string name="y700_manage_pins">管理固定应用</string>
++    <string name="y700_manage_excluded">管理排除应用</string>
++    <string name="y700_alias">搜索别名</string>
++    <string name="y700_alias_hint">选择应用编辑搜索别名。长按也可设置别名、固定、排除与隐藏。</string>
++    <string name="y700_pin">固定／取消固定常用应用</string>
++    <string name="y700_exclude">排除／恢复推荐</string>
++    <string name="y700_hide">隐藏应用</string>
++    <string name="y700_taskbar">ZUI 原生 Taskbar</string>
++    <string name="y700_taskbar_note">打开 ZUI 桌面编辑原生任务栏。Android 限制其他启动器直接编辑。按主页返回，默认启动器不变。</string>
++</resources>
+diff --git a/lawnchair/res/values-zh-rTW/y700_drawer.xml b/lawnchair/res/values-zh-rTW/y700_drawer.xml
+new file mode 100644
+index 0000000..6e3d97c
+--- /dev/null
++++ b/lawnchair/res/values-zh-rTW/y700_drawer.xml
+@@ -0,0 +1,18 @@
++<resources>
++    <string name="y700_layout">抽屜版面</string>
++    <string name="y700_search_bottom">搜尋框置於底部</string>
++    <string name="y700_frequent_bottom">常用 App 列置於底部</string>
++    <string name="y700_auto_grid">自動調整網格欄數</string>
++    <string name="y700_frequent">最近常用 App</string>
++    <string name="y700_show_frequent">顯示常用 App 列</string>
++    <string name="y700_local_history">僅依本啟動器的最近啟動及使用頻率排序。紀錄留在本機，不需要使用情況存取權。</string>
++    <string name="y700_manage_pins">管理釘選 App</string>
++    <string name="y700_manage_excluded">管理排除 App</string>
++    <string name="y700_alias">搜尋別名</string>
++    <string name="y700_alias_hint">選擇 App 編輯搜尋別名。長按也可設定別名、釘選、排除與隱藏。</string>
++    <string name="y700_pin">釘選／取消釘選常用 App</string>
++    <string name="y700_exclude">排除／恢復推薦</string>
++    <string name="y700_hide">隱藏 App</string>
++    <string name="y700_taskbar">ZUI 原生 Taskbar</string>
++    <string name="y700_taskbar_note">開啟 ZUI 桌面編輯原生工具列。Android 限制其他啟動器直接編輯。按首頁返回，預設啟動器不變。</string>
++</resources>
+diff --git a/lawnchair/res/values/y700_drawer.xml b/lawnchair/res/values/y700_drawer.xml
+new file mode 100644
+index 0000000..def7ab4
+--- /dev/null
++++ b/lawnchair/res/values/y700_drawer.xml
+@@ -0,0 +1,19 @@
++<resources>
++    <string name="y700_layout">Drawer layout</string>
++    <string name="y700_search_bottom">Search at bottom</string>
++    <string name="y700_frequent_bottom">Frequent apps at bottom</string>
++    <string name="y700_auto_grid">Automatic grid columns</string>
++    <string name="y700_frequent">Frequent apps</string>
++    <string name="y700_show_frequent">Show frequent apps</string>
++    <string name="y700_local_history">Ranks recent and frequent launches from this launcher only. History stays on this device; Usage Access is not required.</string>
++    <string name="y700_manage_pins">Manage pinned apps</string>
++    <string name="y700_manage_excluded">Manage excluded apps</string>
++    <string name="y700_alias">Search aliases</string>
++    <string name="y700_alias_hint">Choose an app to edit its search alias. Long-press also offers alias, pin, exclude and hide.</string>
++    <string name="y700_pin">Pin / unpin frequent app</string>
++    <string name="y700_exclude">Exclude / include recommendation</string>
++    <string name="y700_hide">Hide app</string>
++    <string name="y700_taskbar">ZUI native Taskbar</string>
++    <string name="y700_taskbar_note">Open ZUI Home to edit its native bar. Android restricts direct editing from other launchers. Return using Home; the default launcher stays unchanged.</string>
++    <item type="id" name="y700_frequent_row" />
++</resources>
+diff --git a/lawnchair/src/app/lawnchair/DeviceProfileOverrides.kt b/lawnchair/src/app/lawnchair/DeviceProfileOverrides.kt
+index 5b064cd..55c2c87 100644
+--- a/lawnchair/src/app/lawnchair/DeviceProfileOverrides.kt
++++ b/lawnchair/src/app/lawnchair/DeviceProfileOverrides.kt
+@@ -89,7 +89,9 @@ class DeviceProfileOverrides(context: Context) : SafeCloseable {
+             prefs2: PreferenceManager2,
+             defaultGrid: InvariantDeviceProfile.GridOption,
+         ) : this(
+-            numAllAppsColumns = prefs2.drawerColumns.firstBlocking(gridOption = defaultGrid),
++            numAllAppsColumns = if (prefs2.drawerAutomaticColumns.firstBlocking()) {
++                (app.lawnchair.LawnchairApp.instance.resources.configuration.screenWidthDp / 80).coerceIn(3, 12)
++            } else prefs2.drawerColumns.firstBlocking(gridOption = defaultGrid),
+             numFolderRows = prefs.folderRows.get(defaultGrid),
+             numFolderColumns = prefs2.folderColumns.firstBlocking(gridOption = defaultGrid),
+ 
+diff --git a/lawnchair/src/app/lawnchair/LawnchairLauncher.kt b/lawnchair/src/app/lawnchair/LawnchairLauncher.kt
+index ff8ea35..19e2f2e 100644
+--- a/lawnchair/src/app/lawnchair/LawnchairLauncher.kt
++++ b/lawnchair/src/app/lawnchair/LawnchairLauncher.kt
+@@ -262,7 +262,9 @@ class LawnchairLauncher : QuickstepLauncher() {
+     override fun getSupportedShortcuts(): Stream<SystemShortcut.Factory<*>> = Stream.concat(
+         super.getSupportedShortcuts(),
+         Stream.concat(
+-            Stream.of(LawnchairShortcut.UNINSTALL, LawnchairShortcut.CUSTOMIZE),
++            Stream.of(LawnchairShortcut.UNINSTALL, LawnchairShortcut.CUSTOMIZE,
++                app.lawnchair.y700.DrawerShortcuts.PIN, app.lawnchair.y700.DrawerShortcuts.EXCLUDE,
++                app.lawnchair.y700.DrawerShortcuts.HIDE, app.lawnchair.y700.DrawerShortcuts.ALIAS),
+             if (LawnchairApp.isRecentsEnabled) Stream.of(LawnchairShortcut.PAUSE_APPS) else Stream.empty(),
+         ),
+     )
+diff --git a/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt b/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
+index aa44969..1376b67 100644
+--- a/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
++++ b/lawnchair/src/app/lawnchair/allapps/AllAppsSearchInput.kt
+@@ -122,7 +122,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+         micIcon = ViewCompat.requireViewById(this, R.id.mic_btn)
+         lensIcon = ViewCompat.requireViewById(this, R.id.lens_btn)
+ 
+-        val shouldShowIcons = prefs2.matchHotseatQsbStyle.firstBlocking()
++        val shouldShowIcons = false
+ 
+         val searchProvider = getSearchProvider(context, prefs2)
+         val isGoogle = searchProvider == Google || searchProvider == GoogleGo || searchProvider == PixelSearch
+@@ -223,6 +223,7 @@ class AllAppsSearchInput(context: Context, attrs: AttributeSet?) :
+             },
+             afterTextChanged = {
+                 updateHint()
++                if (::appsView.isInitialized) appsView.requestLayout()
+                 if (input.text.isNullOrEmpty()) {
+                     searchAlgorithm?.doZeroStateSearch(this)
+                 }
+diff --git a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
+index eced8b1..36f59c0 100644
+--- a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
++++ b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
+@@ -2,10 +2,116 @@ package app.lawnchair.allapps.views
+ 
+ import android.content.Context
+ import android.util.AttributeSet
++import android.view.LayoutInflater
++import android.view.View
++import android.widget.LinearLayout
++import androidx.core.view.WindowInsetsCompat
++import app.lawnchair.launcher
++import app.lawnchair.preferences2.PreferenceManager2
+ import app.lawnchair.search.LawnchairSearchUiDelegate
++import app.lawnchair.y700.DrawerHistory
++import com.android.launcher3.BubbleTextView
++import com.android.launcher3.LauncherState
++import com.android.launcher3.R
+ import com.android.launcher3.allapps.LauncherAllAppsContainerView
++import com.android.launcher3.statemanager.StateManager
++import com.patrykmichalik.opto.core.firstBlocking
+ 
+-class SearchContainerView(context: Context?, attrs: AttributeSet?) : LauncherAllAppsContainerView(context, attrs) {
+-
++/** Fixed drawer chrome, with independent top/bottom positions and IME-safe content bounds. */
++class SearchContainerView(context: Context, attrs: AttributeSet?) : LauncherAllAppsContainerView(context, attrs) {
++    private var frequent: LinearLayout? = null
++    private var lastColumns = -1
++    private val history = DrawerHistory(context)
++    private val prefs by lazy { PreferenceManager2.getInstance(context) }
++    private val stateListener = object : StateManager.StateListener<LauncherState> {
++        override fun onStateTransitionStart(toState: LauncherState) {
++            if (toState == LauncherState.ALL_APPS) refreshFrequent()
++        }
++        override fun onStateTransitionComplete(finalState: LauncherState) {
++            if (finalState == LauncherState.ALL_APPS) requestLayout()
++        }
++    }
+     override fun createSearchUiDelegate() = LawnchairSearchUiDelegate(this)
++    override fun onFinishInflate() {
++        super.onFinishInflate()
++        frequent = LinearLayout(context).apply {
++            orientation = LinearLayout.HORIZONTAL
++            id = R.id.y700_frequent_row
++        }.also { addView(it, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)) }
++    }
++    override fun onAttachedToWindow() {
++        super.onAttachedToWindow()
++        context.launcher.stateManager.addStateListener(stateListener)
++        appsStore.addUpdateListener(updateListener)
++        refreshFrequent()
++    }
++    override fun onDetachedFromWindow() {
++        context.launcher.stateManager.removeStateListener(stateListener)
++        appsStore.removeUpdateListener(updateListener)
++        super.onDetachedFromWindow()
++    }
++    private val updateListener = com.android.launcher3.allapps.AllAppsStore.OnUpdateListener { refreshFrequent() }
++    fun refreshFrequent() {
++        val row = frequent ?: return
++        val columns = ((width / resources.displayMetrics.density) / 80).toInt().coerceIn(1, 12)
++        lastColumns = columns
++        row.removeAllViews()
++        val hidden = prefs.hiddenApps.firstBlocking()
++        // Private/work profiles remain in their native tabs and never leak into recommendations.
++        val apps = appsStore.apps.filter { it.user == android.os.Process.myUserHandle() }
++        history.recommendations(apps, hidden, columns).forEach { app ->
++            val icon = LayoutInflater.from(context).inflate(R.layout.all_apps_icon, row, false) as BubbleTextView
++            icon.applyFromApplicationInfo(app)
++            icon.setOnClickListener(context.launcher.itemOnClickListener)
++            icon.setOnLongClickListener(context.launcher.allAppsItemLongClickListener)
++            row.addView(icon, LinearLayout.LayoutParams(0, context.launcher.deviceProfile.allAppsCellHeightPx, 1f))
++        }
++        requestLayout()
++    }
++    override fun onApplyWindowInsets(insets: android.view.WindowInsets): android.view.WindowInsets {
++        val result = super.onApplyWindowInsets(insets)
++        requestLayout()
++        return result
++    }
++    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
++        super.onLayout(changed, l, t, r, b)
++        val row = frequent ?: return
++        val columns = ((width / resources.displayMetrics.density) / 80).toInt().coerceIn(1, 12)
++        if (columns != lastColumns) post { refreshFrequent() }
++        val insets = rootWindowInsets?.let { WindowInsetsCompat.toWindowInsetsCompat(it) }
++        val bars = insets?.getInsets(WindowInsetsCompat.Type.systemBars())
++        val ime = insets?.getInsets(WindowInsetsCompat.Type.ime())?.bottom ?: 0
++        val screen = IntArray(2).also { getLocationOnScreen(it) }
++        val root = rootView
++        val rootLocation = IntArray(2).also { root.getLocationOnScreen(it) }
++        val visibleBottom = rootLocation[1] + root.height - maxOf(ime, bars?.bottom ?: 0) - screen[1]
++        var top = maxOf(paddingTop, (bars?.top ?: 0) - screen[1], 0)
++        var bottom = minOf(height - paddingBottom, visibleBottom).coerceAtLeast(top)
++        val left = paddingLeft
++        val right = width - paddingRight
++        val search = searchView
++        val searchBottom = prefs.drawerSearchAtBottom.firstBlocking()
++        val rowBottom = prefs.drawerFrequentAtBottom.firstBlocking()
++        val showRow = searchUiManager.editText?.text.isNullOrEmpty() && prefs.drawerFrequentEnabled.firstBlocking()
++        row.visibility = if (showRow) View.VISIBLE else View.GONE
++        val searchHeight = if (search.visibility == View.VISIBLE) search.measuredHeight else 0
++        val rowHeight = if (showRow) context.launcher.deviceProfile.allAppsCellHeightPx else 0
++        fun place(view: View, y: Int, h: Int) {
++            view.measure(MeasureSpec.makeMeasureSpec((right - left).coerceAtLeast(0), MeasureSpec.EXACTLY),
++                MeasureSpec.makeMeasureSpec(h.coerceAtLeast(0), MeasureSpec.EXACTLY))
++            view.layout(left, y, right, y + h)
++        }
++        // Same-side order is stable: row above search at bottom, search above row at top.
++        if (searchBottom) { bottom -= searchHeight; place(search, bottom, searchHeight) }
++        else { place(search, top, searchHeight); top += searchHeight }
++        if (rowBottom) { bottom -= rowHeight; place(row, bottom, rowHeight) }
++        else { place(row, top, rowHeight); top += rowHeight }
++        val header = floatingHeaderView
++        place(header, top, header.measuredHeight)
++        val content = appsRecyclerViewContainer
++        place(content, top, (bottom - top).coerceAtLeast(0))
++        if (content !== mSearchRecyclerView) place(mSearchRecyclerView, top, (bottom - top).coerceAtLeast(0))
++        // No tablet bottom-sheet gutter: drawer uses the available full-screen surface.
++        mBottomSheetBackground.layout(0, 0, width, height)
++    }
+ }
+diff --git a/lawnchair/src/app/lawnchair/preferences2/PreferenceManager2.kt b/lawnchair/src/app/lawnchair/preferences2/PreferenceManager2.kt
+index c4d6204..5997521 100644
+--- a/lawnchair/src/app/lawnchair/preferences2/PreferenceManager2.kt
++++ b/lawnchair/src/app/lawnchair/preferences2/PreferenceManager2.kt
+@@ -382,9 +382,25 @@ class PreferenceManager2 private constructor(private val context: Context) :
+         defaultValue = context.resources.getBoolean(R.bool.config_default_enable_smartspace_calendar_selection),
+     )
+ 
++    val drawerSearchAtBottom = preference(
++        key = booleanPreferencesKey("y700_drawer_search_bottom"), defaultValue = true,
++        onSet = { reloadHelper.recreate() },
++    )
++    val drawerFrequentAtBottom = preference(
++        key = booleanPreferencesKey("y700_drawer_frequent_bottom"), defaultValue = true,
++        onSet = { reloadHelper.recreate() },
++    )
++    val drawerFrequentEnabled = preference(
++        key = booleanPreferencesKey("y700_drawer_frequent_enabled"), defaultValue = true,
++        onSet = { reloadHelper.recreate() },
++    )
++    val drawerAutomaticColumns = preference(
++        key = booleanPreferencesKey("y700_drawer_auto_columns"), defaultValue = true,
++        onSet = { reloadHelper.reloadGrid() },
++    )
+     val autoShowKeyboardInDrawer = preference(
+         key = booleanPreferencesKey(name = "auto_show_keyboard_in_drawer"),
+-        defaultValue = context.resources.getBoolean(R.bool.config_default_auto_show_keyboard_in_drawer),
++        defaultValue = true,
+     )
+ 
+     val workspaceTextColor = preference(
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt b/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt
+index 4dda9a7..d074f45 100644
+--- a/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt
++++ b/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt
+@@ -17,6 +17,10 @@ internal class ChineseAppSearch(query: String) {
+         ""
+     }
+ 
++    companion object {
++        fun normalize(value: String): String = if (Build.VERSION.SDK_INT >= 29) ChineseAliases.simplified(value.trim()) else value.trim().lowercase(Locale.ROOT)
++    }
++
+     fun matches(title: String): Boolean {
+         if (Build.VERSION.SDK_INT < 29 || pinyinQuery.isEmpty() || !containsHan(title)) return false
+         val aliases = ChineseAliases.forTitle(title)
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/LawnchairAppSearchAlgorithm.kt b/lawnchair/src/app/lawnchair/search/algorithms/LawnchairAppSearchAlgorithm.kt
+index 6735906..e970ffc 100644
+--- a/lawnchair/src/app/lawnchair/search/algorithms/LawnchairAppSearchAlgorithm.kt
++++ b/lawnchair/src/app/lawnchair/search/algorithms/LawnchairAppSearchAlgorithm.kt
+@@ -75,11 +75,7 @@ class LawnchairAppSearchAlgorithm(context: Context) : LawnchairSearchAlgorithm(c
+         apps: MutableList<AppInfo>,
+         query: String,
+     ): ArrayList<BaseAllAppsAdapter.AdapterItem> {
+-        val appResults = if (enableFuzzySearch) {
+-            SearchUtils.fuzzySearch(apps, query, maxResultsCount, hiddenApps, hiddenAppsInSearch)
+-        } else {
+-            SearchUtils.normalSearch(apps, query, maxResultsCount, hiddenApps, hiddenAppsInSearch)
+-        }
++        val appResults = SearchUtils.drawerSearch(context, apps, query, maxResultsCount, hiddenApps, hiddenAppsInSearch, enableFuzzySearch)
+ 
+         val searchTargets = mutableListOf<SearchTargetCompat>()
+ 
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt b/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt
+index bdead04..0c2d69f 100644
+--- a/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt
++++ b/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt
+@@ -13,6 +13,25 @@ import me.xdrop.fuzzywuzzy.FuzzySearch
+ import me.xdrop.fuzzywuzzy.algorithms.WeightedRatio
+ 
+ object SearchUtils {
++    fun drawerSearch(context: Context, apps: List<AppInfo>, query: String, maxResults: Int,
++        hiddenApps: Set<String>, hiddenMode: String, fuzzy: Boolean): List<AppInfo> {
++        val history = app.lawnchair.y700.DrawerHistory(context)
++        val chinese = ChineseAppSearch(query)
++        val normalizedQuery = ChineseAppSearch.normalize(query)
++        val matcher = StringMatcherUtility.StringMatcher.getInstance()
++        return apps.asSequence().filterHiddenApps(query.lowercase(Locale.ROOT), hiddenApps, hiddenMode)
++            .filter { app ->
++                listOf(app.title.toString(), history.alias(app)).any { name ->
++                    name.isNotBlank() && (StringMatcherUtility.matches(query.lowercase(Locale.ROOT), name, matcher) ||
++                        chinese.matches(name) || (fuzzy && FuzzySearch.weightedRatio(query.lowercase(Locale.ROOT), name.lowercase(Locale.ROOT)) >= 65))
++                }
++            }
++            .sortedWith(compareByDescending<AppInfo> { app ->
++                listOf(app.title.toString(), history.alias(app)).any { ChineseAppSearch.normalize(it) == normalizedQuery }
++            }.thenByDescending { history.count(it) }.thenBy { it.title.toString().lowercase(Locale.ROOT) })
++            .take(maxResults).toList()
++    }
++
+     fun normalSearch(apps: List<AppInfo>, query: String, maxResultsCount: Int, hiddenApps: Set<String>, hiddenAppsInSearch: String): List<AppInfo> {
+         // Do an intersection of the words in the query and each title, and filter out all the
+         // apps that don't match all of the words in the query.
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt b/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt
+index 0766225..9da96be 100644
+--- a/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt
++++ b/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt
+@@ -20,11 +20,9 @@ object AppSearchProvider {
+         val maxAppResults = prefs.maxAppSearchResultCount.firstBlocking()
+         val enableFuzzySearch = prefs.enableFuzzySearch.firstBlocking()
+ 
+-        val appResults = if (enableFuzzySearch) {
+-            fuzzySearch(allApps.data, query, maxAppResults, hiddenApps, hiddenAppsInSearch)
+-        } else {
+-            normalSearch(allApps.data, query, maxAppResults, hiddenApps, hiddenAppsInSearch)
+-        }
++        val appResults = app.lawnchair.search.algorithms.SearchUtils.drawerSearch(
++            context, allApps.data, query, maxAppResults, hiddenApps, hiddenAppsInSearch, enableFuzzySearch,
++        )
+ 
+         return appResults.map { SearchResult.App(data = it) }
+     }
+diff --git a/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt b/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt
+index eb03df4..af1c495 100644
+--- a/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt
++++ b/lawnchair/src/app/lawnchair/ui/preferences/destinations/AppDrawerPreferences.kt
+@@ -73,6 +73,7 @@ fun AppDrawerPreferences(
+         backArrowVisible = !LocalIsExpandedScreen.current,
+         modifier = modifier,
+     ) {
++        app.lawnchair.y700.DrawerPreferences()
+         val drawerListAdapter = prefs.drawerList.getAdapter()
+         DrawerLayoutPreference(drawerListAdapter)
+         ExpandAndShrink(visible = drawerListAdapter.state.value) {
+@@ -86,7 +87,7 @@ fun AppDrawerPreferences(
+                 destination = AppDrawerHiddenApps,
+             )
+             SearchBarPreference(SearchRoute.DRAWER_SEARCH, showLabel = false)
+-            SuggestionsPreference()
++
+         }
+         PreferenceGroup(heading = stringResource(R.string.style)) {
+             ColorPreference(preference = prefs2.appDrawerBackgroundColor)
+diff --git a/lawnchair/src/app/lawnchair/y700/DrawerHistory.kt b/lawnchair/src/app/lawnchair/y700/DrawerHistory.kt
+new file mode 100644
+index 0000000..764add8
+--- /dev/null
++++ b/lawnchair/src/app/lawnchair/y700/DrawerHistory.kt
+@@ -0,0 +1,41 @@
++package app.lawnchair.y700
++
++import android.content.Context
++import com.android.launcher3.model.data.AppInfo
++import com.android.launcher3.model.data.ItemInfo
++import java.util.Locale
++import kotlin.math.ln
++
++/** Launcher-originated launches only. No Usage Access, network or cloud dependency. */
++class DrawerHistory(context: Context) {
++    private val prefs = context.applicationContext.getSharedPreferences("y700_drawer_local", Context.MODE_PRIVATE)
++    fun key(item: ItemInfo): String = "${item.targetComponent?.flattenToString()}#${item.user}"
++    fun alias(item: ItemInfo): String = prefs.getString("alias:${key(item)}", "").orEmpty()
++    fun setAlias(item: ItemInfo, value: String) { prefs.edit().putString("alias:${key(item)}", value.trim()).apply() }
++    fun count(item: ItemInfo): Int = prefs.getInt("count:${key(item)}", 0)
++    fun record(item: ItemInfo) {
++        if (item.targetComponent == null) return
++        prefs.edit().putInt("count:${key(item)}", (count(item) + 1).coerceAtMost(1000000))
++            .putLong("last:${key(item)}", System.currentTimeMillis()).apply()
++    }
++    private fun members(kind: String) = prefs.getStringSet(kind, emptySet()).orEmpty().toSet()
++    fun contains(kind: String, item: ItemInfo) = key(item) in members(kind)
++    fun toggle(kind: String, item: ItemInfo) {
++        val entries = members(kind).toMutableSet()
++        if (!entries.add(key(item))) entries.remove(key(item))
++        prefs.edit().putStringSet(kind, entries).apply()
++    }
++    fun clear(kind: String) { prefs.edit().remove(kind).apply() }
++    fun score(item: ItemInfo, now: Long = System.currentTimeMillis()): Double {
++        val last = prefs.getLong("last:${key(item)}", 0)
++        val ageDays = ((now - last).coerceAtLeast(0)).toDouble() / 86400000.0
++        return ln(1.0 + count(item)) + if (last > 0) 4.0 / (1.0 + ageDays) else 0.0
++    }
++    fun recommendations(apps: List<AppInfo>, hidden: Set<String>, limit: Int): List<AppInfo> {
++        val available = apps.filter { it.toComponentKey().toString() !in hidden && !contains("excluded", it) }
++        val now = System.currentTimeMillis()
++        return available.sortedWith(compareByDescending<AppInfo> { contains("pinned", it) }
++            .thenByDescending { score(it, now) }.thenBy { it.title.toString().lowercase(Locale.ROOT) }
++            .thenBy { key(it) }).take(limit)
++    }
++}
+diff --git a/lawnchair/src/app/lawnchair/y700/DrawerPreferences.kt b/lawnchair/src/app/lawnchair/y700/DrawerPreferences.kt
+new file mode 100644
+index 0000000..74067e4
+--- /dev/null
++++ b/lawnchair/src/app/lawnchair/y700/DrawerPreferences.kt
+@@ -0,0 +1,68 @@
++package app.lawnchair.y700
++
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.res.stringResource
++import app.lawnchair.preferences.getAdapter
++import app.lawnchair.preferences2.preferenceManager2
++import app.lawnchair.ui.preferences.components.controls.ClickablePreference
++import app.lawnchair.ui.preferences.components.controls.SwitchPreference
++import app.lawnchair.ui.preferences.components.layout.PreferenceGroup
++import com.android.launcher3.R
++
++@Composable
++fun DrawerPreferences() {
++    val prefs = preferenceManager2()
++    val context = LocalContext.current
++    PreferenceGroup(heading = stringResource(R.string.y700_layout)) {
++        SwitchPreference(adapter = prefs.drawerSearchAtBottom.getAdapter(), label = stringResource(R.string.y700_search_bottom))
++        SwitchPreference(adapter = prefs.drawerFrequentAtBottom.getAdapter(), label = stringResource(R.string.y700_frequent_bottom))
++        SwitchPreference(adapter = prefs.drawerAutomaticColumns.getAdapter(), label = stringResource(R.string.y700_auto_grid))
++    }
++    PreferenceGroup(heading = stringResource(R.string.y700_frequent)) {
++        SwitchPreference(adapter = prefs.drawerFrequentEnabled.getAdapter(), label = stringResource(R.string.y700_show_frequent),
++            description = stringResource(R.string.y700_local_history))
++        ClickablePreference(label = stringResource(R.string.y700_manage_pins), onClick = { manage(context, "pinned", R.string.y700_manage_pins) })
++        ClickablePreference(label = stringResource(R.string.y700_manage_excluded), onClick = { manage(context, "excluded", R.string.y700_manage_excluded) })
++        ClickablePreference(label = stringResource(R.string.y700_alias), subtitle = stringResource(R.string.y700_alias_hint), onClick = { manageAliases(context) })
++    }
++    PreferenceGroup(heading = stringResource(R.string.y700_taskbar)) {
++        ClickablePreference(label = stringResource(R.string.y700_taskbar), subtitle = stringResource(R.string.y700_taskbar_note), onClick = {
++            val intent = android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_HOME).setPackage("com.zui.launcher")
++            runCatching { context.startActivity(intent) }
++        })
++    }
++}
++
++private fun installed(context: android.content.Context): List<android.content.pm.LauncherActivityInfo> =
++    context.getSystemService(android.content.pm.LauncherApps::class.java)
++        .getActivityList(null, android.os.Process.myUserHandle()).sortedBy { it.label.toString() }
++
++private fun app(info: android.content.pm.LauncherActivityInfo) = com.android.launcher3.model.data.AppInfo().apply {
++    componentName = info.componentName
++    user = info.user
++    title = info.label
++    intent = android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_LAUNCHER).setComponent(info.componentName)
++}
++
++private fun manage(context: android.content.Context, kind: String, title: Int) {
++    val history = DrawerHistory(context)
++    val entries = installed(context)
++    val selected = entries.map { history.contains(kind, app(it)) }.toBooleanArray()
++    android.app.AlertDialog.Builder(context).setTitle(title)
++        .setMultiChoiceItems(entries.map { it.label }.toTypedArray(), selected) { _, index, _ -> history.toggle(kind, app(entries[index])) }
++        .setPositiveButton(android.R.string.ok, null).show()
++}
++
++private fun manageAliases(context: android.content.Context) {
++    val history = DrawerHistory(context)
++    val entries = installed(context)
++    android.app.AlertDialog.Builder(context).setTitle(R.string.y700_alias)
++        .setItems(entries.map { it.label }.toTypedArray()) { _, index ->
++            val item = app(entries[index])
++            val input = android.widget.EditText(context).apply { setSingleLine(); setText(history.alias(item)); hint = item.title }
++            android.app.AlertDialog.Builder(context).setTitle(item.title).setView(input)
++                .setPositiveButton(android.R.string.ok) { _, _ -> history.setAlias(item, input.text.toString()) }
++                .setNegativeButton(android.R.string.cancel, null).show()
++        }.show()
++}
+diff --git a/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt b/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt
+new file mode 100644
+index 0000000..a179ba9
+--- /dev/null
++++ b/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt
+@@ -0,0 +1,40 @@
++package app.lawnchair.y700
++
++import android.view.View
++import android.widget.EditText
++import app.lawnchair.LawnchairLauncher
++import app.lawnchair.preferences2.PreferenceManager2
++import com.android.launcher3.AbstractFloatingView
++import com.android.launcher3.R
++import com.android.launcher3.model.data.AppInfo
++import com.android.launcher3.model.data.ItemInfo
++import com.android.launcher3.popup.SystemShortcut
++import com.patrykmichalik.opto.core.firstBlocking
++import kotlinx.coroutines.launch
++import androidx.lifecycle.lifecycleScope
++
++object DrawerShortcuts {
++    private fun action(label: Int, block: (LawnchairLauncher, AppInfo) -> Unit) =
++        SystemShortcut.Factory<LawnchairLauncher> { launcher, item, view ->
++            if (item !is AppInfo) null else object : SystemShortcut<LawnchairLauncher>(R.drawable.ic_edit, label, launcher, item, view) {
++                override fun onClick(v: View) {
++                    AbstractFloatingView.closeAllOpenViews(launcher)
++                    block(launcher, item)
++                    (launcher.appsView as? app.lawnchair.allapps.views.SearchContainerView)?.refreshFrequent()
++                }
++            }
++        }
++    val PIN = action(R.string.y700_pin) { launcher, app -> DrawerHistory(launcher).toggle("pinned", app) }
++    val EXCLUDE = action(R.string.y700_exclude) { launcher, app -> DrawerHistory(launcher).toggle("excluded", app) }
++    val HIDE = action(R.string.y700_hide) { launcher, app ->
++        val pref = PreferenceManager2.getInstance(launcher).hiddenApps
++        launcher.lifecycleScope.launch { pref.set(pref.firstBlocking() + app.toComponentKey().toString()) }
++    }
++    val ALIAS = action(R.string.y700_alias) { launcher, app ->
++        val history = DrawerHistory(launcher)
++        val input = EditText(launcher).apply { setSingleLine(); setText(history.alias(app)); hint = app.title }
++        android.app.AlertDialog.Builder(launcher).setTitle(R.string.y700_alias).setView(input)
++            .setPositiveButton(android.R.string.ok) { _, _ -> history.setAlias(app, input.text.toString()) }
++            .setNegativeButton(android.R.string.cancel, null).show()
++    }
++}
+diff --git a/src/com/android/launcher3/Launcher.java b/src/com/android/launcher3/Launcher.java
+index 0cad4ec..f37ca05 100644
+--- a/src/com/android/launcher3/Launcher.java
++++ b/src/com/android/launcher3/Launcher.java
+@@ -2228,6 +2228,9 @@ public class Launcher extends StatefulActivity<LauncherState>
+         }
+ 
+         RunnableList result = super.startActivitySafely(v, intent, item);
++        if (result != null && item != null && hasBeenResumed()) {
++            new app.lawnchair.y700.DrawerHistory(this).record(item);
++        }
+         if (result != null && v instanceof BubbleTextView) {
+             // This is set to the view that launched the activity that navigated the user
+             // away

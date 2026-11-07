@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- 2026-11-07: Implement Issue #3 drawer chrome with independent search/frequent-row placement, local recent/frequency recommendations, pin/exclude/hide/alias actions and management, exact Chinese/alias matching before launch-frequency ordering, automatic grid columns and keyboard-on-open default. Preserve native search styling, gestures and popup shortcuts. History is launcher-originated and local only; no Usage Access permission is added. Compilation and device acceptance pending.
+- 2026-11-07: Issue #2 device investigation confirms ZUI Taskbar owner `com.zui.launcher`, navigation-bar-panel window type and signature|privileged READ_SETTINGS/WRITE_SETTINGS permissions. ADB provider query failed and run-as reports package not debuggable. Add a supported explicit ZUI HOME entry for native editing without changing default HOME. Direct native cross-app Taskbar editing/synchronization from our app remains blocked; no overlay or private API added.
+
+
 - 2026-11-07: Actions run [42326549446](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42326549446) passed packaging, package ID and permanent signer verification and published the [signed preview](https://github.com/pulipulichen/Y700-Launcher-Plus/releases/tag/lawnchair15-preview-42326549446-1). Verified the SHA-256 before installing over the prior APK on TB320FC. Confirmed cold start, default HOME, ZUI-owned Taskbar visibility, ZUI Recents, and return from Settings. Legacy preferences were backed up. Full device acceptance and migration remain pending.
 
 - 2026-11-07: Actions run [42325661068](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42325661068) failed during `lintVitalLawnWithQuickstepPlayRelease` with 1,527 upstream resource errors across `ResAuto`, `MissingDefaultResource` and `ExtraTranslation`. Restore the upstream release packaging setting and run lint separately as an advisory check after the preview APK passes package, signature and checksum verification.
