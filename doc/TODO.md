@@ -2,6 +2,8 @@
 
 更新日期：2026-11-07
 
+Lawnchair 15 預覽版最新狀態：Issue #3 抽屜改善已實作並完成主要 Y700 真機驗證；Issue #2 已提供原生編輯入口，直接編輯／同步 ZUI 跨 App Taskbar 仍受系統權限限制。詳見 [實作與驗證紀錄](ISSUES-2-3.md)。以下舊版功能清單與 Lawnchair 遷移狀態需分開判讀。
+
 > 本文件依 README.md、docs/NOVA-PARITY.md、docs/ARCHITECTURE.md、docs/PHASE0.md 與 GOOGLE_PLAY.md 整理。未在文件中確認完成的功能列為待辦或待驗證，不代表程式碼一定不存在。專案既有文件位於 `docs/`，本檔依要求放在 `doc/`。
 
 ## 已有基礎（不重複列為待開發）

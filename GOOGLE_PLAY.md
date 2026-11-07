@@ -13,3 +13,5 @@
 ## Drawer recommendations and search aliases
 
 The Lawnchair preview stores launcher-originated launch counts/timestamps, pinned/excluded app component/profile keys and optional search aliases in app-private local preferences. These records are not uploaded, do not require Usage Access, and are excluded by the existing Android backup allowlist. Clearing app storage or uninstalling removes them. Any future cloud backup or system Usage Access integration requires a new data-flow and privacy review. Document these actual behaviors in the final privacy policy and Data safety submission; the app is not ready for Play submission yet.
+
+Existing Lawnchair web suggestions are a separate data flow: when enabled, typed search queries can be sent to the configured provider, including an alias the user types. Do not describe all search activity as offline or local-only in the privacy policy. Recommendation counters and timestamps are not included in those requests.
