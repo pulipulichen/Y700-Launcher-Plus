@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 2026-11-07: Actions run [42323763050](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323763050) spent more than 18 minutes in the combined release assembly and debug lint step without publishing an APK. Build and lint the same release variant in separate bounded steps. The preview skips code and resource shrinking. Superseded preview runs are cancelled.
+
 - 2026-11-07: Actions run [42323346868](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323346868) reached Android manifest merging and failed because the Y700 icon conflicted with the upstream Quickstep icon. Use the same Y700 drawable in all three app manifests.
 
 - 2026-11-07: Added Traditional/Simplified Chinese aliases, accent-insensitive pinyin and pinyin initials to both Lawnchair app search paths. Matching uses Android ICU and its default readings for characters with multiple pronunciations. Hidden-app search rules still apply. Android compile and device search acceptance are pending.

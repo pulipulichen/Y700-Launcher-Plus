@@ -12,9 +12,18 @@ index e8fa644..8b0009d 100644
          android:largeHeap="@bool/config_largeHeap"
          android:restoreAnyVersion="true"
 diff --git a/build.gradle b/build.gradle
-index fc3ef62..8c9cf4c 100644
+index fc3ef62..d528433 100644
 --- a/build.gradle
 +++ b/build.gradle
+@@ -37,7 +37,7 @@ allprojects {
+             }
+             lint {
+                 abortOnError true
+-                checkReleaseBuilds false
++                checkReleaseBuilds providers.gradleProperty("y700Preview").isPresent()
+             }
+             compileOptions {
+                 sourceCompatibility = libs.versions.jdkRelease.get()
 @@ -157,8 +157,8 @@ android {
      defaultConfig {
          // Lawnchair Launcher 15.0 Beta 3
@@ -40,7 +49,7 @@ index fc3ef62..8c9cf4c 100644
          releaseSigning = signingConfigs.debug
      }
 
-@@ -244,11 +248,11 @@ android {
+@@ -244,13 +248,13 @@ android {
 
          debug {
              applicationIdSuffix ".debug"
@@ -50,10 +59,14 @@ index fc3ef62..8c9cf4c 100644
 
          release {
 -            resValue("string", "derived_app_name", "Lawnchair")
+-            minifyEnabled true
+-            shrinkResources true
 +            resValue("string", "derived_app_name", "Y700 Launcher Plus")
-             minifyEnabled true
-             shrinkResources true
++            minifyEnabled !providers.gradleProperty("y700Preview").isPresent()
++            shrinkResources !providers.gradleProperty("y700Preview").isPresent()
              proguardFiles proguardFilesFromAosp + "proguard.pro"
+         }
+     }
 @@ -288,7 +292,7 @@ android {
          }
 

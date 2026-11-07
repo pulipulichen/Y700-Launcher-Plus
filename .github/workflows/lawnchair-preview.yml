@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: lawnchair-preview-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-publish:
@@ -44,7 +44,8 @@ jobs:
         uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
         with:
           cache-provider: basic
-      - name: Build and lint with fixed signing
+      - name: Build APK with fixed signing
+        timeout-minutes: 18
         env:
           SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
@@ -67,8 +68,12 @@ jobs:
           [[ "$fp" == '8F:4C:5A:D0:18:AA:5F:E5:32:C4:F1:FF:12:60:EF:08:02:82:48:9D:C6:D2:03:2A:5E:BD:62:AF:18:EE:54:B3' ]] || { echo "::error::Permanent key fingerprint mismatch."; exit 1; }
           echo "Using verified permanent signing certificate."
           version_code=$(( $(date -u +%s) / 60 ))
-          ./gradlew --no-daemon --console=plain -PappVersionCode="$version_code" -PrequirePermanentSigning \
-            assembleLawnWithQuickstepPlayRelease lintLawnWithQuickstepPlayDebug
+          ./gradlew --no-daemon --console=plain -PappVersionCode="$version_code" -PrequirePermanentSigning -Py700Preview \
+            assembleLawnWithQuickstepPlayRelease
+      - name: Lint preview variant
+        timeout-minutes: 15
+        working-directory: ${{ runner.temp }}/y700-lawnchair
+        run: ./gradlew --no-daemon --console=plain -Py700Preview lintLawnWithQuickstepPlayRelease
       - name: Prepare release assets
         shell: bash
         run: |
