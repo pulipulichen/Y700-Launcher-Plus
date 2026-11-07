@@ -18,6 +18,7 @@ public final class DrawerRankTest {
         check(DrawerRank.columns(720, 3) == 9, "Tablet portrait grid width");
         check(DrawerRank.columns(1280, 3) == 12, "Landscape grid maximum");
         check(DrawerRank.columns(64, 1) == 1, "Narrow frequent row minimum");
-        System.out.println("11 drawer ranking and responsive layout checks passed");
+        check(DrawerRank.columns(887f / 2, 1) == 5, "Landscape IME compact row keeps labels readable");
+        System.out.println("12 drawer ranking and responsive layout checks passed");
     }
 }

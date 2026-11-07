@@ -1,3 +1,24 @@
+diff --git a/lawnchair/res/layout/y700_frequent_compact.xml b/lawnchair/res/layout/y700_frequent_compact.xml
+new file mode 100644
+index 0000000..b8391d1
+--- /dev/null
++++ b/lawnchair/res/layout/y700_frequent_compact.xml
+@@ -0,0 +1,15 @@
++<?xml version="1.0" encoding="utf-8"?>
++<com.android.launcher3.BubbleTextView xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:launcher="http://schemas.android.com/apk/res-auto"
++    style="@style/BaseIcon.AllApps"
++    android:layout_width="match_parent"
++    android:layout_height="56dp"
++    android:gravity="start|center_vertical"
++    android:paddingStart="8dp"
++    android:paddingEnd="8dp"
++    android:singleLine="true"
++    android:ellipsize="end"
++    launcher:iconDisplay="prediction_row"
++    launcher:iconSizeOverride="32dp"
++    launcher:layoutHorizontal="true"
++    launcher:centerVertically="false" />
 diff --git a/lawnchair/res/values-ja/y700_drawer.xml b/lawnchair/res/values-ja/y700_drawer.xml
 new file mode 100644
 index 0000000..9873db2
@@ -201,10 +222,10 @@ index aa44969..7202247 100644
  
      override fun getEditText() = input
 diff --git a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
-index eced8b1..4f13b86 100644
+index eced8b1..39ec4f7 100644
 --- a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
 +++ b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
-@@ -2,10 +2,122 @@ package app.lawnchair.allapps.views
+@@ -2,10 +2,134 @@ package app.lawnchair.allapps.views
  
  import android.content.Context
  import android.util.AttributeSet
@@ -229,6 +250,7 @@ index eced8b1..4f13b86 100644
 +class SearchContainerView(context: Context, attrs: AttributeSet?) : LauncherAllAppsContainerView(context, attrs) {
 +    private var frequent: LinearLayout? = null
 +    private var lastColumns = -1
++    private var lastCompact = false
 +    private val history = DrawerHistory(context)
 +    private val prefs by lazy { PreferenceManager2.getInstance(context) }
 +    private val stateListener = object : StateManager.StateListener<LauncherState> {
@@ -259,20 +281,30 @@ index eced8b1..4f13b86 100644
 +        super.onDetachedFromWindow()
 +    }
 +    private val updateListener = com.android.launcher3.allapps.AllAppsStore.OnUpdateListener { refreshFrequent() }
++    private fun compactFrequent(): Boolean =
++        resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE &&
++            rootWindowInsets?.let { WindowInsetsCompat.toWindowInsetsCompat(it).isVisible(WindowInsetsCompat.Type.ime()) } == true
++    private fun frequentColumns(compact: Boolean) = app.lawnchair.y700.DrawerRank.columns(
++        width / resources.displayMetrics.density / (if (compact) 2f else 1f), 1,
++    )
++    private fun frequentHeight(compact: Boolean) = if (compact) (56 * resources.displayMetrics.density).toInt()
++        else context.launcher.deviceProfile.allAppsCellHeightPx
 +    fun refreshFrequent() {
 +        val row = frequent ?: return
-+        val columns = app.lawnchair.y700.DrawerRank.columns(width / resources.displayMetrics.density, 1)
++        val compact = compactFrequent()
++        val columns = frequentColumns(compact)
 +        lastColumns = columns
++        lastCompact = compact
 +        row.removeAllViews()
 +        val hidden = prefs.hiddenApps.firstBlocking()
 +        // Private/work profiles remain in their native tabs and never leak into recommendations.
 +        val apps = appsStore.apps.filter { it.user == android.os.Process.myUserHandle() }
 +        history.recommendations(apps, hidden, columns).forEach { app ->
-+            val icon = LayoutInflater.from(context).inflate(R.layout.all_apps_icon, row, false) as BubbleTextView
++            val icon = LayoutInflater.from(context).inflate(if (compact) R.layout.y700_frequent_compact else R.layout.all_apps_icon, row, false) as BubbleTextView
 +            icon.applyFromApplicationInfo(app)
 +            icon.setOnClickListener(context.launcher.itemOnClickListener)
 +            icon.setOnLongClickListener(context.launcher.allAppsItemLongClickListener)
-+            row.addView(icon, LinearLayout.LayoutParams(0, context.launcher.deviceProfile.allAppsCellHeightPx, 1f))
++            row.addView(icon, LinearLayout.LayoutParams(0, frequentHeight(compact), 1f))
 +        }
 +        requestLayout()
 +    }
@@ -284,8 +316,9 @@ index eced8b1..4f13b86 100644
 +    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
 +        super.onLayout(changed, l, t, r, b)
 +        val row = frequent ?: return
-+        val columns = app.lawnchair.y700.DrawerRank.columns(width / resources.displayMetrics.density, 1)
-+        if (columns != lastColumns) post { refreshFrequent() }
++        val compact = compactFrequent()
++        val columns = frequentColumns(compact)
++        if (columns != lastColumns || compact != lastCompact) post { refreshFrequent() }
 +        val insets = rootWindowInsets?.let { WindowInsetsCompat.toWindowInsetsCompat(it) }
 +        val bars = insets?.getInsets(WindowInsetsCompat.Type.systemBars())
 +        val ime = insets?.getInsets(WindowInsetsCompat.Type.ime())?.bottom ?: 0
@@ -303,7 +336,7 @@ index eced8b1..4f13b86 100644
 +        val showRow = searchUiManager.editText?.text.isNullOrEmpty() && prefs.drawerFrequentEnabled.firstBlocking()
 +        row.visibility = if (showRow) View.VISIBLE else View.GONE
 +        val searchHeight = if (search.visibility == View.VISIBLE) search.measuredHeight else 0
-+        val rowHeight = if (showRow) context.launcher.deviceProfile.allAppsCellHeightPx else 0
++        val rowHeight = if (showRow) frequentHeight(compact) else 0
 +        fun place(view: View, y: Int, h: Int) {
 +            view.measure(MeasureSpec.makeMeasureSpec((right - left).coerceAtLeast(0), MeasureSpec.EXACTLY),
 +                MeasureSpec.makeMeasureSpec(h.coerceAtLeast(0), MeasureSpec.EXACTLY))
@@ -623,7 +656,7 @@ index 0000000..a334ca7
 +}
 diff --git a/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt b/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt
 new file mode 100644
-index 0000000..a179ba9
+index 0000000..8e1a77c
 --- /dev/null
 +++ b/lawnchair/src/app/lawnchair/y700/DrawerShortcuts.kt
 @@ -0,0 +1,40 @@
@@ -643,9 +676,9 @@ index 0000000..a179ba9
 +import androidx.lifecycle.lifecycleScope
 +
 +object DrawerShortcuts {
-+    private fun action(label: Int, block: (LawnchairLauncher, AppInfo) -> Unit) =
++    private fun action(icon: Int, label: Int, block: (LawnchairLauncher, AppInfo) -> Unit) =
 +        SystemShortcut.Factory<LawnchairLauncher> { launcher, item, view ->
-+            if (item !is AppInfo) null else object : SystemShortcut<LawnchairLauncher>(R.drawable.ic_edit, label, launcher, item, view) {
++            if (item !is AppInfo) null else object : SystemShortcut<LawnchairLauncher>(icon, label, launcher, item, view) {
 +                override fun onClick(v: View) {
 +                    AbstractFloatingView.closeAllOpenViews(launcher)
 +                    block(launcher, item)
@@ -653,13 +686,13 @@ index 0000000..a179ba9
 +                }
 +            }
 +        }
-+    val PIN = action(R.string.y700_pin) { launcher, app -> DrawerHistory(launcher).toggle("pinned", app) }
-+    val EXCLUDE = action(R.string.y700_exclude) { launcher, app -> DrawerHistory(launcher).toggle("excluded", app) }
-+    val HIDE = action(R.string.y700_hide) { launcher, app ->
++    val PIN = action(R.drawable.ic_pin, R.string.y700_pin) { launcher, app -> DrawerHistory(launcher).toggle("pinned", app) }
++    val EXCLUDE = action(R.drawable.ic_block_no_shadow, R.string.y700_exclude) { launcher, app -> DrawerHistory(launcher).toggle("excluded", app) }
++    val HIDE = action(R.drawable.ic_visibility, R.string.y700_hide) { launcher, app ->
 +        val pref = PreferenceManager2.getInstance(launcher).hiddenApps
 +        launcher.lifecycleScope.launch { pref.set(pref.firstBlocking() + app.toComponentKey().toString()) }
 +    }
-+    val ALIAS = action(R.string.y700_alias) { launcher, app ->
++    val ALIAS = action(R.drawable.ic_edit, R.string.y700_alias) { launcher, app ->
 +        val history = DrawerHistory(launcher)
 +        val input = EditText(launcher).apply { setSingleLine(); setText(history.alias(app)); hint = app.title }
 +        android.app.AlertDialog.Builder(launcher).setTitle(R.string.y700_alias).setView(input)
@@ -696,3 +729,16 @@ index 0cad4ec..f37ca05 100644
          if (result != null && v instanceof BubbleTextView) {
              // This is set to the view that launched the activity that navigated the user
              // away
+diff --git a/src/com/android/launcher3/allapps/FloatingHeaderView.java b/src/com/android/launcher3/allapps/FloatingHeaderView.java
+index e2bf952..bdb9e15 100644
+--- a/src/com/android/launcher3/allapps/FloatingHeaderView.java
++++ b/src/com/android/launcher3/allapps/FloatingHeaderView.java
+@@ -279,6 +279,8 @@ public class FloatingHeaderView extends LinearLayout implements
+ 
+     int getMaxTranslation() {
+         if (mMaxTranslation == 0 && (mTabsHidden || mFloatingRowsCollapsed)) {
++            // Y700 fixed chrome already reserves its own space; no empty-header gutter.
++            if (getParent() instanceof app.lawnchair.allapps.views.SearchContainerView) return 0;
+             return getResources().getDimensionPixelSize(R.dimen.all_apps_search_bar_bottom_padding);
+         } else if (mMaxTranslation > 0 && mTabsHidden) {
+             return mMaxTranslation + getPaddingTop();
