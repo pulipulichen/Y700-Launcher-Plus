@@ -13,5 +13,6 @@ test "$(git rev-parse HEAD)" = "$upstream_commit"
 git submodule update --init --depth=1
 test "$(git -C platform_frameworks_libs_systemui rev-parse HEAD)" = "$systemui_commit"
 git apply "$project_root/lawnchair/y700.patch"
+git apply "$project_root/lawnchair/chinese-search.patch"
 install -D -m 644 "$project_root/app/src/main/res/mipmap-nodpi/ic_launcher.png" \
   lawnchair/res/drawable-nodpi/y700_launcher_icon.png

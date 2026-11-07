@@ -1,0 +1,146 @@
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt b/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt
+new file mode 100644
+index 0000000..4dda9a7
+--- /dev/null
++++ b/lawnchair/src/app/lawnchair/search/algorithms/ChineseAppSearch.kt
+@@ -0,0 +1,63 @@
++package app.lawnchair.search.algorithms
++
++import android.icu.text.Transliterator
++import android.os.Build
++import android.util.LruCache
++import androidx.annotation.RequiresApi
++import java.text.Normalizer
++import java.util.Locale
++
++/** Additional aliases for Chinese app names in the drawer and global search. */
++internal class ChineseAppSearch(query: String) {
++    private val hasHanQuery = containsHan(query)
++    private val pinyinQuery = foldPinyin(query)
++    private val simplifiedQuery = if (Build.VERSION.SDK_INT >= 29 && hasHanQuery) {
++        ChineseAliases.simplified(query)
++    } else {
++        ""
++    }
++
++    fun matches(title: String): Boolean {
++        if (Build.VERSION.SDK_INT < 29 || pinyinQuery.isEmpty() || !containsHan(title)) return false
++        val aliases = ChineseAliases.forTitle(title)
++        return if (hasHanQuery) {
++            aliases.simplified.contains(simplifiedQuery)
++        } else {
++            aliases.pinyin.contains(pinyinQuery) || aliases.initials.startsWith(pinyinQuery)
++        }
++    }
++}
++
++private fun containsHan(value: String): Boolean =
++    value.codePoints().anyMatch { Character.UnicodeScript.of(it) == Character.UnicodeScript.HAN }
++
++private val pinyinSeparators = Regex("[\\s'’-]+")
++private val accents = Regex("\\p{M}+")
++
++private fun foldPinyin(value: String): String =
++    Normalizer.normalize(value.lowercase(Locale.ROOT), Normalizer.Form.NFD)
++        .replace(accents, "")
++        .replace(pinyinSeparators, "")
++
++@RequiresApi(29)
++private object ChineseAliases {
++    data class Aliases(val simplified: String, val pinyin: String, val initials: String)
++
++    private val simplify = Transliterator.getInstance("Traditional-Simplified")
++    private val romanize = Transliterator.getInstance("Han-Latin")
++    private val cache = LruCache<String, Aliases>(1024)
++
++    @Synchronized
++    fun simplified(value: String): String = simplify.transliterate(value).lowercase(Locale.ROOT)
++
++    @Synchronized
++    fun forTitle(title: String): Aliases {
++        cache.get(title)?.let { return it }
++        val simplified = simplified(title)
++        val romanized = romanize.transliterate(simplified)
++        val initials = romanized.split(pinyinSeparators)
++            .filter(String::isNotEmpty)
++            .joinToString("") { foldPinyin(it).take(1) }
++        return Aliases(simplified, foldPinyin(romanized), initials).also { cache.put(title, it) }
++    }
++}
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt b/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt
+index 8e6231a..bdead04 100644
+--- a/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt
++++ b/lawnchair/src/app/lawnchair/search/algorithms/SearchUtils.kt
+@@ -18,8 +18,12 @@ object SearchUtils {
+         // apps that don't match all of the words in the query.
+         val queryTextLower = query.lowercase(Locale.getDefault())
+         val matcher = StringMatcherUtility.StringMatcher.getInstance()
++        val chinese = ChineseAppSearch(query)
+         return apps.asSequence()
+-            .filter { StringMatcherUtility.matches(queryTextLower, it.title.toString(), matcher) }
++            .filter {
++                val title = it.title.toString()
++                StringMatcherUtility.matches(queryTextLower, title, matcher) || chinese.matches(title)
++            }
+             .filterHiddenApps(queryTextLower, hiddenApps, hiddenAppsInSearch)
+             .take(maxResultsCount)
+             .toList()
+@@ -38,8 +42,12 @@ object SearchUtils {
+             65,
+         )
+
+-        return matches.take(maxResultsCount)
+-            .map { it.referent }
++        val chinese = ChineseAppSearch(query)
++        return (filteredApps.asSequence().filter { chinese.matches(it.title.toString()) } +
++            matches.asSequence().map { it.referent })
++            .distinct()
++            .take(maxResultsCount)
++            .toList()
+     }
+
+     fun getShortcuts(app: AppInfo, context: Context): List<ShortcutInfo> {
+diff --git a/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt b/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt
+index d56676d..0766225 100644
+--- a/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt
++++ b/lawnchair/src/app/lawnchair/search/algorithms/engine/provider/apps/AppSearchProvider.kt
+@@ -2,6 +2,7 @@ package app.lawnchair.search.algorithms.engine.provider.apps
+
+ import android.content.Context
+ import app.lawnchair.preferences2.PreferenceManager2
++import app.lawnchair.search.algorithms.ChineseAppSearch
+ import app.lawnchair.search.algorithms.engine.SearchResult
+ import app.lawnchair.search.algorithms.filterHiddenApps
+ import com.android.launcher3.model.AllAppsList
+@@ -33,8 +34,12 @@ object AppSearchProvider {
+         // apps that don't match all of the words in the query.
+         val queryTextLower = query.lowercase(Locale.getDefault())
+         val matcher = StringMatcherUtility.StringMatcher.getInstance()
++        val chinese = ChineseAppSearch(query)
+         return apps.asSequence()
+-            .filter { StringMatcherUtility.matches(queryTextLower, it.title.toString(), matcher) }
++            .filter {
++                val title = it.title.toString()
++                StringMatcherUtility.matches(queryTextLower, title, matcher) || chinese.matches(title)
++            }
+             .filterHiddenApps(queryTextLower, hiddenApps, hiddenAppsInSearch)
+             .take(maxResultsCount)
+             .toList()
+@@ -46,9 +51,16 @@ object AppSearchProvider {
+             .filterHiddenApps(queryTextLower, hiddenApps, hiddenAppsInSearch)
+             .toList()
+
++        val chinese = ChineseAppSearch(query)
+         return filteredApps
+             .mapNotNull { app ->
+-                val matchResult = AppMatcher.match(app.title.toString(), queryTextLower)
++                val title = app.title.toString()
++                val original = AppMatcher.match(title, queryTextLower)
++                val matchResult = if (original.type.priority >= MatchType.FUZZY.priority && chinese.matches(title)) {
++                    MatchResult(0.70f, MatchType.SUBSTRING)
++                } else {
++                    original
++                }
+                 if (matchResult.type == MatchType.NO_MATCH) null else Pair(app, matchResult)
+             }
+             .sortedWith(
