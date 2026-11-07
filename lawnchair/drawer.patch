@@ -201,10 +201,10 @@ index aa44969..7202247 100644
  
      override fun getEditText() = input
 diff --git a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
-index eced8b1..8077aea 100644
+index eced8b1..4f13b86 100644
 --- a/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
 +++ b/lawnchair/src/app/lawnchair/allapps/views/SearchContainerView.kt
-@@ -2,10 +2,116 @@ package app.lawnchair.allapps.views
+@@ -2,10 +2,122 @@ package app.lawnchair.allapps.views
  
  import android.content.Context
  import android.util.AttributeSet
@@ -319,6 +319,12 @@ index eced8b1..8077aea 100644
 +        val content = appsRecyclerViewContainer
 +        place(content, top, (bottom - top).coerceAtLeast(0))
 +        if (content !== mSearchRecyclerView) place(mSearchRecyclerView, top, (bottom - top).coerceAtLeast(0))
++        // Keep the fast-scroll touch region out of the fixed row, search and IME.
++        val scrollWidth = mFastScroller.measuredWidth
++        val scrollLeft = mFastScroller.left
++        mFastScroller.measure(MeasureSpec.makeMeasureSpec(scrollWidth, MeasureSpec.EXACTLY),
++            MeasureSpec.makeMeasureSpec((bottom - top).coerceAtLeast(0), MeasureSpec.EXACTLY))
++        mFastScroller.layout(scrollLeft, top, scrollLeft + scrollWidth, bottom.coerceAtLeast(top))
 +        // No tablet bottom-sheet gutter: drawer uses the available full-screen surface.
 +        mBottomSheetBackground.layout(0, 0, width, height)
 +    }
