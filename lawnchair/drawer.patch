@@ -730,7 +730,7 @@ index 0cad4ec..f37ca05 100644
              // This is set to the view that launched the activity that navigated the user
              // away
 diff --git a/src/com/android/launcher3/allapps/FloatingHeaderView.java b/src/com/android/launcher3/allapps/FloatingHeaderView.java
-index e2bf952..bdb9e15 100644
+index e2bf952..18bb359 100644
 --- a/src/com/android/launcher3/allapps/FloatingHeaderView.java
 +++ b/src/com/android/launcher3/allapps/FloatingHeaderView.java
 @@ -279,6 +279,8 @@ public class FloatingHeaderView extends LinearLayout implements
@@ -742,3 +742,14 @@ index e2bf952..bdb9e15 100644
              return getResources().getDimensionPixelSize(R.dimen.all_apps_search_bar_bottom_padding);
          } else if (mMaxTranslation > 0 && mTabsHidden) {
              return mMaxTranslation + getPaddingTop();
+@@ -338,6 +340,10 @@ public class FloatingHeaderView extends LinearLayout implements
+             // Add back spacing that is otherwise covered by the tabs.
+             clipTop += mTabsAdditionalPaddingTop;
+         }
++        if (getParent() instanceof app.lawnchair.allapps.views.SearchContainerView
++                && mTabsHidden && mFloatingRowsHeight == 0) {
++            clipTop = 0;
++        }
+         mRVClip.top = mTabsHidden || mFloatingRowsCollapsed ? clipTop : 0;
+         mHeaderClip.top = clipTop;
+         // clipping on a draw might cause additional redraw
