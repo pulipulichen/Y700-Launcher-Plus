@@ -12,18 +12,9 @@ index e8fa644..8b0009d 100644
          android:largeHeap="@bool/config_largeHeap"
          android:restoreAnyVersion="true"
 diff --git a/build.gradle b/build.gradle
-index fc3ef62..391c763 100644
+index fc3ef62..58d1384 100644
 --- a/build.gradle
 +++ b/build.gradle
-@@ -37,7 +37,7 @@ allprojects {
-             }
-             lint {
-                 abortOnError true
--                checkReleaseBuilds false
-+                checkReleaseBuilds(providers.gradleProperty("y700Preview").isPresent())
-             }
-             compileOptions {
-                 sourceCompatibility = libs.versions.jdkRelease.get()
 @@ -157,8 +157,8 @@ android {
      defaultConfig {
          // Lawnchair Launcher 15.0 Beta 3

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 2026-11-07: Actions run [42325661068](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42325661068) failed during `lintVitalLawnWithQuickstepPlayRelease` with 1,527 upstream resource errors across `ResAuto`, `MissingDefaultResource` and `ExtraTranslation`. Restore the upstream release packaging setting and run lint separately as an advisory check after the preview APK passes package, signature and checksum verification.
+
 - 2026-11-07: Actions run [42323763050](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323763050) spent more than 18 minutes in the combined release assembly and debug lint step without publishing an APK. Build and lint the same release variant in separate bounded steps. The preview skips code and resource shrinking. Superseded preview runs are cancelled.
 
 - 2026-11-07: Actions run [42323346868](https://github.com/pulipulichen/Y700-Launcher-Plus/actions/runs/42323346868) reached Android manifest merging and failed because the Y700 icon conflicted with the upstream Quickstep icon. Use the same Y700 drawable in all three app manifests.

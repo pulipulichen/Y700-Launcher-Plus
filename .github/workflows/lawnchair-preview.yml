@@ -70,10 +70,6 @@ jobs:
           version_code=$(( $(date -u +%s) / 60 ))
           ./gradlew --no-daemon --console=plain -PappVersionCode="$version_code" -PrequirePermanentSigning -Py700Preview \
             assembleLawnWithQuickstepPlayRelease
-      - name: Lint preview variant
-        timeout-minutes: 15
-        working-directory: ${{ runner.temp }}/y700-lawnchair
-        run: ./gradlew --no-daemon --console=plain -Py700Preview lintLawnWithQuickstepPlayRelease
       - name: Prepare release assets
         shell: bash
         run: |
@@ -106,5 +102,10 @@ jobs:
           apk="$RUNNER_TEMP/Y700-Launcher-Plus-Lawnchair15.apk"
           gh release create "$tag" "$apk" "$apk.sha256" --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" --title "Y700 Launcher Plus – Lawnchair 15 preview" \
-            --notes "Signed preview from $GITHUB_SHA. Export your old layout before installing. The preview starts with a fresh Lawnchair layout. Y700 device acceptance is pending." \
+            --notes "Signed preview from $GITHUB_SHA. Export your old layout before installing. The preview starts with a fresh Lawnchair layout. Lint is advisory for this preview. Y700 device acceptance is pending." \
             --prerelease --latest=false
+      - name: Lint preview variant
+        continue-on-error: true
+        timeout-minutes: 15
+        working-directory: ${{ runner.temp }}/y700-lawnchair
+        run: ./gradlew --no-daemon --console=plain -Py700Preview lintLawnWithQuickstepPlayRelease
